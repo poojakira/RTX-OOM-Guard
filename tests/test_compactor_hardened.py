@@ -1,5 +1,5 @@
 from unittest.mock import patch
-from apex_aegis.defrag_engine.compactor import MemoryCompactor
+from rtx_oom_guard.defrag_engine.compactor import MemoryCompactor
 
 def test_compactor_lifecycle_mocked():
     """Verify compaction cycle with mocked CUDA."""

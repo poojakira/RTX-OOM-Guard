@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
 export const Panel9_LatencyBarGraph = ({ history }) => {
-    // Map the actual history trace from apex_aegis if available, else blank
+    // Map the actual history trace from rtx_oom_guard if available, else blank
     const data = useMemo(() => {
         if (!history || history.length === 0) {
             return Array.from({length: 10}).map((_,i) => ({ id: `SWEEP_${i}`, latency: 0 }));

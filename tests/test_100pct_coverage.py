@@ -1,7 +1,7 @@
 """
 Enterprise-grade coverage completion tests.
 
-Surgically targets every remaining uncovered line across the apex_aegis codebase
+Surgically targets every remaining uncovered line across the rtx_oom_guard codebase
 to achieve 100% statement coverage in a platform-agnostic CI environment.
 
 Coverage Gap Reference (from pytest --cov-report=term-missing):
@@ -50,13 +50,13 @@ class TestCLICoverage:
         import importlib
         # Temporarily force reimport of cli with rich unavailable
         with patch.dict("sys.modules", {"rich": None, "rich.console": None, "rich.panel": None, "rich.text": None}):
-            if "apex_aegis.cli" in sys.modules:
+            if "rtx_oom_guard.cli" in sys.modules:
                 # We need to ensure the except branch was hit at module load
                 # The current module already imported successfully, so just
                 # verify no-rich fallback works via the public API
-                from apex_aegis.cli import _print, print_banner, HAS_RICH
-                with patch("apex_aegis.cli.HAS_RICH", False), \
-                     patch("apex_aegis.cli.console", None), \
+                from rtx_oom_guard.cli import _print, print_banner, HAS_RICH
+                with patch("rtx_oom_guard.cli.HAS_RICH", False), \
+                     patch("rtx_oom_guard.cli.console", None), \
                      patch("builtins.print") as mock_print:
                     print_banner()
                     _print("test message")
@@ -64,16 +64,16 @@ class TestCLICoverage:
 
     def test_cli_collect_error_branch(self):
         """Hit lines 85-86: exception during collection prints error."""
-        from apex_aegis.cli import collect_cmd
-        with patch("sys.argv", ["apex_aegis-collect", "--model", "gpt2", "--iterations", "1"]), \
-             patch("apex_aegis.profiler.collector.collect_from_model", side_effect=RuntimeError("Collection Fail")), \
-             patch("apex_aegis.cli._print") as mock_print:
+        from rtx_oom_guard.cli import collect_cmd
+        with patch("sys.argv", ["rtx_oom_guard-collect", "--model", "gpt2", "--iterations", "1"]), \
+             patch("rtx_oom_guard.profiler.collector.collect_from_model", side_effect=RuntimeError("Collection Fail")), \
+             patch("rtx_oom_guard.cli._print") as mock_print:
             collect_cmd()
             assert any("Collection Fail" in str(call) for call in mock_print.call_args_list)
 
     def test_cli_status_dashboard_missing(self):
         """Hit line 292: dashboard dist path does not exist."""
-        from apex_aegis.cli import main
+        from rtx_oom_guard.cli import main
 
         def exists_side(path_str):
             s = str(path_str)
@@ -81,18 +81,18 @@ class TestCLICoverage:
                 return False
             return False
 
-        with patch("sys.argv", ["apex_aegis", "status"]), \
+        with patch("sys.argv", ["rtx_oom_guard", "status"]), \
              patch("torch.cuda.is_available", return_value=False), \
              patch("os.path.exists", side_effect=exists_side), \
-             patch("apex_aegis.cli._print") as mock_print:
+             patch("rtx_oom_guard.cli._print") as mock_print:
             main()
             output = " ".join(str(c) for c in mock_print.call_args_list)
             assert "status" in output.lower() or "READY" in output or mock_print.called
 
     def test_cli_main_guard(self):
         """Hit line 350: the if __name__ == '__main__' block."""
-        from apex_aegis import cli
-        with patch("sys.argv", ["apex_aegis", "--help"]):
+        from rtx_oom_guard import cli
+        with patch("sys.argv", ["rtx_oom_guard", "--help"]):
             try:
                 cli.main()
             except SystemExit:
@@ -109,7 +109,7 @@ class TestDashboardCoverage:
 
     def test_sync_loop_copy_failure(self, tmp_path):
         """Hit lines 48-49: shutil.copy2 fails for a telemetry file."""
-        from apex_aegis.dashboard import DashboardManager
+        from rtx_oom_guard.dashboard import DashboardManager
         mgr = DashboardManager(root_dir=str(tmp_path))
         mgr._ensure_dirs()
 
@@ -129,7 +129,7 @@ class TestDashboardCoverage:
 
     def test_sync_loop_command_sync(self, tmp_path):
         """Hit lines 55-58: command sync from dashboard to results."""
-        from apex_aegis.dashboard import DashboardManager
+        from rtx_oom_guard.dashboard import DashboardManager
         mgr = DashboardManager(root_dir=str(tmp_path))
         mgr._ensure_dirs()
 
@@ -144,7 +144,7 @@ class TestDashboardCoverage:
 
     def test_sync_loop_command_sync_failure(self, tmp_path):
         """Hit lines 55-58 error branch: command sync fails."""
-        from apex_aegis.dashboard import DashboardManager
+        from rtx_oom_guard.dashboard import DashboardManager
         mgr = DashboardManager(root_dir=str(tmp_path))
         mgr._ensure_dirs()
 
@@ -163,7 +163,7 @@ class TestDashboardCoverage:
 
     def test_dashboard_start_no_node_modules(self, tmp_path):
         """Hit lines 65-66: node_modules directory missing."""
-        from apex_aegis.dashboard import DashboardManager
+        from rtx_oom_guard.dashboard import DashboardManager
         mgr = DashboardManager(root_dir=str(tmp_path))
         (tmp_path / "dashboard").mkdir(parents=True, exist_ok=True)
         # Don't create node_modules → triggers the error return
@@ -172,7 +172,7 @@ class TestDashboardCoverage:
 
     def test_dashboard_module_main_block(self):
         """Hit line 121: __main__ guard in dashboard.py."""
-        from apex_aegis import dashboard
+        from rtx_oom_guard import dashboard
         # The if __name__ == "__main__" block won't execute on import
         # but we can call main() directly with proper mocks
         with patch("time.sleep", side_effect=KeyboardInterrupt), \
@@ -191,13 +191,13 @@ class TestBenchmarkTritonCoverage:
 
     def test_run_benchmark_no_triton(self):
         """Hit lines 34-35: TRITON_AVAILABLE=False → early return."""
-        from apex_aegis.defrag_engine import benchmark_triton
+        from rtx_oom_guard.defrag_engine import benchmark_triton
         with patch.object(benchmark_triton, "TRITON_AVAILABLE", False):
             benchmark_triton.run_benchmark()  # Should return immediately
 
     def test_benchmark_triton_equivalent_branch(self):
         """Hit line 77: triton slower than pytorch branch."""
-        from apex_aegis.defrag_engine import benchmark_triton
+        from rtx_oom_guard.defrag_engine import benchmark_triton
         # If triton is not available, this path isn't reachable via actual benchmark
         # So we mock TRITON_AVAILABLE=True and mock the kernel calls
         with patch.object(benchmark_triton, "TRITON_AVAILABLE", True), \
@@ -223,7 +223,7 @@ class TestBenchmarkTritonCoverage:
 
     def test_benchmark_main_guard(self):
         """Hit line 86: __main__ guard."""
-        from apex_aegis.defrag_engine import benchmark_triton
+        from rtx_oom_guard.defrag_engine import benchmark_triton
         with patch.object(benchmark_triton, "TRITON_AVAILABLE", False):
             benchmark_triton.run_benchmark()
 
@@ -239,16 +239,16 @@ class TestDefragmenterCoverage:
 
     def test_defrag_triton_import_path(self):
         """Lines 25-28: Triton import failure fallback (the dummy function)."""
-        from apex_aegis.defrag_engine.defragmenter import HAS_TRITON
+        from rtx_oom_guard.defrag_engine.defragmenter import HAS_TRITON
         if not HAS_TRITON:
             # The fallback function should raise RuntimeError
-            from apex_aegis.defrag_engine.defragmenter import triton_compaction_copy
+            from rtx_oom_guard.defrag_engine.defragmenter import triton_compaction_copy
             with pytest.raises(RuntimeError, match="Triton not available"):
                 triton_compaction_copy(None, None)
 
     def test_defrag_no_matching_after_filter(self):
         """Line 93: tensors exist but none match device/dtype."""
-        from apex_aegis.defrag_engine.defragmenter import GPUMemoryDefragmenter
+        from rtx_oom_guard.defrag_engine.defragmenter import GPUMemoryDefragmenter
         engine = GPUMemoryDefragmenter()
         t1 = torch.randn(10, dtype=torch.float32)
         t2 = torch.randn(10, dtype=torch.float64)  # Different dtype
@@ -259,7 +259,7 @@ class TestDefragmenterCoverage:
 
     def test_defrag_chunk_size_zero_guard(self):
         """Line 110: chunk_size_elements <= 0 fallback."""
-        from apex_aegis.defrag_engine.defragmenter import GPUMemoryDefragmenter
+        from rtx_oom_guard.defrag_engine.defragmenter import GPUMemoryDefragmenter
         engine = GPUMemoryDefragmenter()
         # Create tiny tensor with very small element_size to test chunk_size edge cases
         t = torch.randn(5)
@@ -268,14 +268,14 @@ class TestDefragmenterCoverage:
 
     def test_defrag_throttle_skip(self):
         """Line 218: throttle — not forced and within 200ms window."""
-        from apex_aegis.defrag_engine.defragmenter import GPUMemoryDefragmenter
+        from rtx_oom_guard.defrag_engine.defragmenter import GPUMemoryDefragmenter
         engine = GPUMemoryDefragmenter()
         engine._last_write_time = time.time()  # Just wrote
         engine._persist_telemetry(100, 200, force=False)  # Should return early
 
     def test_defrag_async_write_mkstemp_failure(self):
         """Lines 261-262 (outer try/except for async write triggering)."""
-        from apex_aegis.defrag_engine.defragmenter import GPUMemoryDefragmenter
+        from rtx_oom_guard.defrag_engine.defragmenter import GPUMemoryDefragmenter
         engine = GPUMemoryDefragmenter()
         # Patch threading.Thread to raise during start()
         with patch("threading.Thread", side_effect=Exception("Thread creation failed")):
@@ -284,7 +284,7 @@ class TestDefragmenterCoverage:
 
     def test_defrag_ddp_barrier(self):
         """Line 119: DDP sync barrier before defragmentation."""
-        from apex_aegis.defrag_engine.defragmenter import GPUMemoryDefragmenter
+        from rtx_oom_guard.defrag_engine.defragmenter import GPUMemoryDefragmenter
         engine = GPUMemoryDefragmenter()
         t = torch.randn(10)
         with patch("torch.distributed.is_available", return_value=True), \
@@ -304,13 +304,13 @@ class TestKernelsCoverage:
 
     def test_kernels_triton_import_branches(self):
         """Lines 12-13: HAS_TRITON flag check."""
-        from apex_aegis.defrag import compaction_kernels as kernels
+        from rtx_oom_guard.defrag import compaction_kernels as kernels
         # Just verify the module loaded and HAS_TRITON is set
         assert isinstance(kernels.HAS_TRITON, bool)
 
     def test_kernels_empty_tensor_return(self):
         """Line 77: n_elements == 0 returns immediately."""
-        from apex_aegis.defrag.compaction_kernels import triton_compaction_copy
+        from rtx_oom_guard.defrag.compaction_kernels import triton_compaction_copy
         # Can only be called on CUDA tensors — skip if no CUDA.
         # But the assertion at line 68 prevents CPU tensors. 
         # We'll mock the assertion check.
@@ -327,7 +327,7 @@ class TestKernelsCoverage:
 
     def test_analyze_fragmentation_empty(self):
         """Line 134: n_blocks == 0 returns 0.0."""
-        from apex_aegis.defrag.compaction_kernels import analyze_fragmentation_triton
+        from rtx_oom_guard.defrag.compaction_kernels import analyze_fragmentation_triton
         # Empty tensor → should return 0.0
         empty = torch.tensor([], dtype=torch.float32)
         with patch.object(torch.Tensor, "is_cuda", new_callable=PropertyMock, return_value=True):
@@ -336,7 +336,7 @@ class TestKernelsCoverage:
 
     def test_analyze_fragmentation_non_cuda(self):
         """Line 130: non-CUDA tensor gets moved to CUDA (mock path)."""
-        from apex_aegis.defrag.compaction_kernels import analyze_fragmentation_triton
+        from rtx_oom_guard.defrag.compaction_kernels import analyze_fragmentation_triton
         t = torch.tensor([100, -500, 200], dtype=torch.float32)
         # Mock the .is_cuda check and .cuda() call
         with patch.object(torch.Tensor, "is_cuda", new_callable=PropertyMock, return_value=False), \
@@ -359,7 +359,7 @@ class TestPolicyCoverage:
 
     def test_mitigation_action_to_dict(self):
         """Line 42: MitigationAction.to_dict() method."""
-        from apex_aegis.defrag_engine.policy import MitigationAction
+        from rtx_oom_guard.defrag_engine.policy import MitigationAction
         action = MitigationAction(
             timestamp=time.time(), risk_score=0.5, tier="WARN",
             message="test", cache_cleared=False
@@ -370,8 +370,8 @@ class TestPolicyCoverage:
 
     def test_policy_heartbeat_exception(self):
         """Lines 152-153: exception in heartbeat telemetry."""
-        from apex_aegis.defrag_engine.policy import MitigationPolicy
-        from apex_aegis.defrag_engine.defragmenter import GPUMemoryDefragmenter
+        from rtx_oom_guard.defrag_engine.policy import MitigationPolicy
+        from rtx_oom_guard.defrag_engine.defragmenter import GPUMemoryDefragmenter
         engine = GPUMemoryDefragmenter()
         policy = MitigationPolicy(engine=engine)
         with patch("torch.cuda.is_available", side_effect=Exception("CUDA error")):
@@ -380,7 +380,7 @@ class TestPolicyCoverage:
 
     def test_try_empty_cache_exception(self):
         """Lines 181-182: _try_empty_cache when cuda import fails."""
-        from apex_aegis.defrag_engine.policy import MitigationPolicy
+        from rtx_oom_guard.defrag_engine.policy import MitigationPolicy
         with patch("torch.cuda.is_available", side_effect=Exception("fail")):
             result = MitigationPolicy._try_empty_cache()
             assert result is False
@@ -395,7 +395,7 @@ class TestQuantizationCoverage:
 
     def test_quantization_with_cuda_available(self):
         """Lines 30-31: CUDA available → model.to(dtype)."""
-        from apex_aegis.optimization.quantization import apply_gpu_quantization
+        from rtx_oom_guard.optimization.quantization import apply_gpu_quantization
         model = torch.nn.Linear(10, 5)
         with patch("torch.cuda.is_available", return_value=True):
             result = apply_gpu_quantization(model, dtype=torch.float16)
@@ -403,7 +403,7 @@ class TestQuantizationCoverage:
 
     def test_get_model_size_mb_with_buffers(self):
         """Line 40: model with buffers."""
-        from apex_aegis.optimization.quantization import get_model_size_mb
+        from rtx_oom_guard.optimization.quantization import get_model_size_mb
         model = torch.nn.BatchNorm1d(10)  # Has buffers (running_mean, running_var)
         size = get_model_size_mb(model)
         assert size > 0
@@ -418,8 +418,8 @@ class TestAllocatorLoggerCoverage:
 
     def test_mem_stats_cuda_available(self):
         """Lines 43-44: _mem_stats when CUDA is available."""
-        from apex_aegis.profiler.allocator_logger import _mem_stats
-        with patch("apex_aegis.profiler.allocator_logger._cuda_available", return_value=True), \
+        from rtx_oom_guard.profiler.allocator_logger import _mem_stats
+        with patch("rtx_oom_guard.profiler.allocator_logger._cuda_available", return_value=True), \
              patch("torch.cuda.memory_allocated", return_value=1024 * 1024 * 100), \
              patch("torch.cuda.memory_reserved", return_value=1024 * 1024 * 200):
             stats = _mem_stats()
@@ -437,7 +437,7 @@ class TestCollectorCoverage:
 
     def test_collector_record_no_cuda(self):
         """Line 52: record() returns immediately when CUDA not available."""
-        from apex_aegis.profiler.collector import AllocationCollector
+        from rtx_oom_guard.profiler.collector import AllocationCollector
         collector = AllocationCollector()
         with patch("torch.cuda.is_available", return_value=False):
             collector.record()
@@ -445,15 +445,15 @@ class TestCollectorCoverage:
 
     def test_collect_from_model_resnet50(self):
         """Lines 160-161: build_resnet50 branch in collect_from_model."""
-        from apex_aegis.profiler.collector import collect_from_model
+        from rtx_oom_guard.profiler.collector import collect_from_model
         mock_model = MagicMock()
         mock_model.parameters.return_value = [torch.randn(10)]
         mock_model.return_value = torch.randn(1, requires_grad=True)
 
         mock_inputs = torch.randn(1)
 
-        with patch("apex_aegis.profiler.collector.ensure_cuda"), \
-             patch("apex_aegis.trainer._models.build_resnet50", return_value=(mock_model, mock_inputs)), \
+        with patch("rtx_oom_guard.profiler.collector.ensure_cuda"), \
+             patch("rtx_oom_guard.trainer._models.build_resnet50", return_value=(mock_model, mock_inputs)), \
              patch("torch.cuda.is_available", return_value=False), \
              patch("torch.cuda.memory_allocated", return_value=0), \
              patch("torch.cuda.memory_reserved", return_value=0), \
@@ -463,15 +463,15 @@ class TestCollectorCoverage:
 
     def test_collect_from_model_bert(self):
         """Lines 163-164: build_bert branch in collect_from_model."""
-        from apex_aegis.profiler.collector import collect_from_model
+        from rtx_oom_guard.profiler.collector import collect_from_model
         mock_model = MagicMock()
         mock_model.parameters.return_value = [torch.randn(10)]
         mock_model.return_value = torch.randn(1, requires_grad=True)
 
         mock_inputs = torch.randn(1)
 
-        with patch("apex_aegis.profiler.collector.ensure_cuda"), \
-             patch("apex_aegis.trainer._models.build_bert", return_value=(mock_model, mock_inputs)), \
+        with patch("rtx_oom_guard.profiler.collector.ensure_cuda"), \
+             patch("rtx_oom_guard.trainer._models.build_bert", return_value=(mock_model, mock_inputs)), \
              patch("torch.cuda.is_available", return_value=False), \
              patch("torch.cuda.memory_allocated", return_value=0), \
              patch("torch.cuda.memory_reserved", return_value=0), \
@@ -481,14 +481,14 @@ class TestCollectorCoverage:
 
     def test_collect_from_model_iteration_logging(self):
         """Line 197: the 50-iteration logging branch."""
-        from apex_aegis.profiler.collector import collect_from_model
+        from rtx_oom_guard.profiler.collector import collect_from_model
         mock_model = MagicMock()
         mock_model.parameters.return_value = [torch.randn(10)]
         mock_model.return_value = torch.randn(1, requires_grad=True)
         mock_inputs = torch.randn(1)
 
-        with patch("apex_aegis.profiler.collector.ensure_cuda"), \
-             patch("apex_aegis.trainer._models.build_gpt2", return_value=(mock_model, mock_inputs)), \
+        with patch("rtx_oom_guard.profiler.collector.ensure_cuda"), \
+             patch("rtx_oom_guard.trainer._models.build_gpt2", return_value=(mock_model, mock_inputs)), \
              patch("torch.cuda.is_available", return_value=False), \
              patch("torch.cuda.memory_allocated", return_value=0), \
              patch("torch.cuda.memory_reserved", return_value=0), \
@@ -506,8 +506,8 @@ class TestDatasetCoverage:
 
     def test_dataset_empty_raises(self, tmp_path):
         """Line 106: empty dataset raises RuntimeError."""
-        from apex_aegis.scheduler.dataset import create_dataloaders
-        from apex_aegis.utils import DefragConfig
+        from rtx_oom_guard.scheduler.dataset import create_dataloaders
+        from rtx_oom_guard.utils import DefragConfig
         empty_dir = tmp_path / "empty_traces"
         empty_dir.mkdir()
         config = DefragConfig(trace_dir=str(empty_dir))
@@ -525,13 +525,13 @@ class TestMonitorCoverage:
 
     def test_monitor_load_model_exception_fallback(self):
         """Lines 110-113: exception loading default weights → untrained model."""
-        from apex_aegis.scheduler.monitor import DefragMonitor
-        from apex_aegis.utils import DefragConfig
+        from rtx_oom_guard.scheduler.monitor import DefragMonitor
+        from rtx_oom_guard.utils import DefragConfig
         config = DefragConfig()
         monitor = DefragMonitor(config=config)
         
         with patch("os.path.exists", return_value=False), \
-             patch.dict("sys.modules", {"apex_aegis.scheduler.default_weights": MagicMock(DEFAULT_WEIGHTS_B64="invalid==")}):
+             patch.dict("sys.modules", {"rtx_oom_guard.scheduler.default_weights": MagicMock(DEFAULT_WEIGHTS_B64="invalid==")}):
             # Force the except Exception branch at line 110-113
             with patch("torch.load", side_effect=Exception("Corrupt weights")):
                 monitor._load_model()
@@ -539,7 +539,7 @@ class TestMonitorCoverage:
 
     def test_monitor_auto_record_with_delta(self):
         """Line 176: auto_record detects memory change."""
-        from apex_aegis.scheduler.monitor import DefragMonitor
+        from rtx_oom_guard.scheduler.monitor import DefragMonitor
         monitor = DefragMonitor()
         monitor._last_mem = 1000
 
@@ -551,9 +551,9 @@ class TestMonitorCoverage:
 
     def test_monitor_predict_snapshot_parsing(self):
         """Lines 188-191: snapshot parsing in _predict_and_act."""
-        from apex_aegis.scheduler.monitor import DefragMonitor
-        from apex_aegis.utils import DefragConfig
-        from apex_aegis.predictor.model import FragPredictor
+        from rtx_oom_guard.scheduler.monitor import DefragMonitor
+        from rtx_oom_guard.utils import DefragConfig
+        from rtx_oom_guard.predictor.model import FragPredictor
 
         config = DefragConfig()
         config.enable_snapshots = True
@@ -566,15 +566,15 @@ class TestMonitorCoverage:
         monitor._buffer_full = True
         monitor._buffer = np.random.rand(config.seq_len, config.input_dim).astype(np.float32)
 
-        with patch("apex_aegis.utils.parse_memory_snapshot", return_value={"frag_score": 0.9}), \
+        with patch("rtx_oom_guard.utils.parse_memory_snapshot", return_value={"frag_score": 0.9}), \
              patch("torch.cuda.is_available", return_value=False):
             monitor._predict_and_act()
 
     def test_monitor_pending_compaction_ddp(self):
         """Lines 199, 224: pending compaction when ddp_sync is True."""
-        from apex_aegis.scheduler.monitor import DefragMonitor
-        from apex_aegis.utils import DefragConfig
-        from apex_aegis.predictor.model import FragPredictor
+        from rtx_oom_guard.scheduler.monitor import DefragMonitor
+        from rtx_oom_guard.utils import DefragConfig
+        from rtx_oom_guard.predictor.model import FragPredictor
 
         config = DefragConfig()
         config.ddp_sync = True
@@ -603,7 +603,7 @@ class TestModelsCoverage:
 
     def test_build_resnet50_no_torchvision(self):
         """Line 56: torchvision not available → fallback CNN."""
-        from apex_aegis.trainer._models import build_resnet50
+        from rtx_oom_guard.trainer._models import build_resnet50
         with patch.dict("sys.modules", {"torchvision": None, "torchvision.models": None}), \
              patch("torch.cuda.is_available", return_value=False):
             # Force ImportError in build_resnet50
@@ -622,7 +622,7 @@ class TestAutoInstrumentCoverage:
 
     def test_instrumented_model_tuple_output(self):
         """Lines 58-61: output is tuple of tensors with requires_grad."""
-        from apex_aegis.trainer.auto_instrument import auto_instrument
+        from rtx_oom_guard.trainer.auto_instrument import auto_instrument
 
         model = torch.nn.Linear(10, 5)
         optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
@@ -648,14 +648,14 @@ class TestAutoInstrumentCoverage:
 
     def test_auto_instrument_heartbeat_exception(self):
         """Lines 153-155: initial heartbeat fails silently."""
-        from apex_aegis.trainer.auto_instrument import auto_instrument
+        from rtx_oom_guard.trainer.auto_instrument import auto_instrument
 
         model = torch.nn.Linear(10, 5)
         optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
 
         with patch("torch.cuda.is_available", return_value=True), \
              patch("torch.cuda.memory_allocated", side_effect=Exception("CUDA fail")), \
-             patch("apex_aegis.trainer.auto_instrument.DDPSyncManager"):
+             patch("rtx_oom_guard.trainer.auto_instrument.DDPSyncManager"):
             wrapped_model, wrapped_opt = auto_instrument(model, optimizer)
             assert wrapped_model is not None
 
@@ -669,7 +669,7 @@ class TestDDPCoverage:
 
     def test_ddp_sync_events_overflow(self):
         """Line 62: sync_events list exceeds 50 → pop(0)."""
-        from apex_aegis.trainer.ddp import DDPSyncManager
+        from rtx_oom_guard.trainer.ddp import DDPSyncManager
         mgr = DDPSyncManager()
         mgr.sync_events = list(range(51))  # Exceed 50
         assert len(mgr.sync_events) > 50
@@ -681,7 +681,7 @@ class TestDDPCoverage:
 
     def test_ddp_get_avg_overhead_with_events(self):
         """Line 82: get_avg_overhead with actual events."""
-        from apex_aegis.trainer.ddp import DDPSyncManager
+        from rtx_oom_guard.trainer.ddp import DDPSyncManager
         mgr = DDPSyncManager()
         mgr.sync_events = [1.0, 2.0, 3.0]
         avg = mgr.get_avg_overhead()
@@ -697,8 +697,8 @@ class TestTrainerCoverage:
 
     def test_trainer_verbose_and_best_save(self, tmp_path):
         """Lines 80, 89: verbose logging and model checkpointing during training."""
-        from apex_aegis.trainer.trainer import train
-        from apex_aegis.utils import DefragConfig
+        from rtx_oom_guard.trainer.trainer import train
+        from rtx_oom_guard.utils import DefragConfig
 
         # Create minimal trace data
         trace_dir = tmp_path / "traces"
@@ -733,7 +733,7 @@ class TestTrainingHookCoverage:
 
     def test_total_gpu_mb_import_error(self):
         """Lines 196-198: torch import fails → return default 8192."""
-        from apex_aegis.trainer.training_hook import TrainingHook
+        from rtx_oom_guard.trainer.training_hook import TrainingHook
         with patch("torch.cuda.is_available", return_value=False):
             result = TrainingHook._total_gpu_mb()
             # When CUDA is not available, returns 8192.0
@@ -743,7 +743,7 @@ class TestTrainingHookCoverage:
 
     def test_total_gpu_mb_import_error_real(self):
         """Lines 196-198: actual ImportError path."""
-        from apex_aegis.trainer.training_hook import TrainingHook
+        from rtx_oom_guard.trainer.training_hook import TrainingHook
         with patch.dict("sys.modules", {"torch": None}):
             # Force ImportError when importing torch inside the method
             # The staticmethod does `import torch` internally
@@ -764,7 +764,7 @@ class TestUtilsCoverage:
 
     def test_get_cuda_info_exception(self):
         """Lines 143-144: get_cuda_info when torch raises exception."""
-        from apex_aegis.utils import get_cuda_info
+        from rtx_oom_guard.utils import get_cuda_info
         with patch("torch.cuda.is_available", side_effect=Exception("CUDA crash")):
             result = get_cuda_info()
             assert result["available"] is False
@@ -772,14 +772,14 @@ class TestUtilsCoverage:
 
     def test_parse_memory_snapshot_no_cuda(self):
         """Line 163: parse_memory_snapshot when CUDA not available."""
-        from apex_aegis.utils import parse_memory_snapshot
+        from rtx_oom_guard.utils import parse_memory_snapshot
         with patch("torch.cuda.is_available", return_value=False):
             result = parse_memory_snapshot()
             assert result["frag_score"] == 0.0
 
     def test_parse_memory_snapshot_exception(self):
         """Lines 167-168: memory_snapshot raises exception."""
-        from apex_aegis.utils import parse_memory_snapshot
+        from rtx_oom_guard.utils import parse_memory_snapshot
         with patch("torch.cuda.is_available", return_value=True), \
              patch("torch.cuda.memory_snapshot", side_effect=Exception("Snapshot fail")):
             result = parse_memory_snapshot()
@@ -788,7 +788,7 @@ class TestUtilsCoverage:
 
     def test_parse_memory_snapshot_with_data(self):
         """Line 188: frag_score calculation with actual block data."""
-        from apex_aegis.utils import parse_memory_snapshot
+        from rtx_oom_guard.utils import parse_memory_snapshot
         fake_snapshot = [{
             "blocks": [
                 {"size": 1024, "state": "active_allocated"},

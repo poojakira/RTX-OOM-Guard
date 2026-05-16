@@ -1,9 +1,9 @@
 import pandas as pd
 import numpy as np
 from unittest.mock import patch
-from apex_aegis.trainer.trainer import train
-from apex_aegis.scheduler.dataset import AllocationDataset, create_dataloaders
-from apex_aegis.utils import DefragConfig
+from rtx_oom_guard.trainer.trainer import train
+from rtx_oom_guard.scheduler.dataset import AllocationDataset, create_dataloaders
+from rtx_oom_guard.utils import DefragConfig
 
 def test_dataset_empty(tmp_path):
     """Verify dataset handles empty trace directory."""

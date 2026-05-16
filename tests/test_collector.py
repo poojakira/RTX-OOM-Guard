@@ -3,8 +3,8 @@
 import torch
 import pytest
 
-from apex_aegis.profiler.collector import AllocationCollector
-from apex_aegis.utils import DefragConfig
+from rtx_oom_guard.profiler.collector import AllocationCollector
+from rtx_oom_guard.utils import DefragConfig
 
 
 class TestAllocationCollector:

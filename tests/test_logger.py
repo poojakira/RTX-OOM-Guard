@@ -6,7 +6,7 @@ import json
 import csv
 from pathlib import Path
 
-from apex_aegis.profiler.allocator_logger import AllocatorLogger, StepRecord
+from rtx_oom_guard.profiler.allocator_logger import AllocatorLogger, StepRecord
 
 
 class TestAllocatorLogger:

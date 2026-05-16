@@ -13,8 +13,8 @@ import mlflow  # type: ignore
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from apex_aegis.trainer._models import SimpleGPT2  # type: ignore
-from apex_aegis.utils import get_logger, ensure_cuda  # type: ignore
+from rtx_oom_guard.trainer._models import SimpleGPT2  # type: ignore
+from rtx_oom_guard.utils import get_logger, ensure_cuda  # type: ignore
 
 log = get_logger("benchmark.baseline")
 

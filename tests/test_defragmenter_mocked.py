@@ -1,6 +1,6 @@
 import torch
 from unittest.mock import MagicMock, patch
-from apex_aegis.defrag_engine.defragmenter import GPUMemoryDefragmenter
+from rtx_oom_guard.defrag_engine.defragmenter import GPUMemoryDefragmenter
 
 def test_defragmenter_with_triton_mocked():
     """Verify that defragmenter calls Triton kernel when available."""
@@ -10,8 +10,8 @@ def test_defragmenter_with_triton_mocked():
     mock_device.index = 0
     
     # We need to ensure HAS_TRITON is True during the test
-    with patch("apex_aegis.defrag_engine.defragmenter.HAS_TRITON", True), \
-         patch("apex_aegis.defrag_engine.defragmenter.triton_compaction_copy") as mock_kernel, \
+    with patch("rtx_oom_guard.defrag_engine.defragmenter.HAS_TRITON", True), \
+         patch("rtx_oom_guard.defrag_engine.defragmenter.triton_compaction_copy") as mock_kernel, \
          patch("torch.cuda.is_available", return_value=True), \
          patch("torch.empty") as mock_empty:
         
@@ -76,7 +76,7 @@ def test_defragmenter_chunking_logic():
             
         engine = GPUMemoryDefragmenter()
         # Mock chunk_size_elements to be small
-        with patch("apex_aegis.defrag_engine.defragmenter.log"):
+        with patch("rtx_oom_guard.defrag_engine.defragmenter.log"):
             # 10 tensors of 100MB = 1000MB. With 256MB chunks, should have 4 chunks.
             engine.defragment_tensors(tensors, reason="test_chunks")
             

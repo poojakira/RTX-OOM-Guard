@@ -2,7 +2,7 @@
 
 import time
 
-from apex_aegis.scheduler.monitor import DefragMonitor
+from rtx_oom_guard.scheduler.monitor import DefragMonitor
 
 
 class TestDefragMonitor:

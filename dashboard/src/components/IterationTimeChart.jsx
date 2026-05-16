@@ -47,7 +47,7 @@ export const IterationTimeChart = ({ data }) => {
         />
         <Area 
           type="monotone" 
-          name="apex_aegis" 
+          name="rtx_oom_guard" 
           dataKey="defragTime" 
           stroke="#3377ff" 
           strokeWidth={2}

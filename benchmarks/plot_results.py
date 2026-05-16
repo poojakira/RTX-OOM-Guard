@@ -21,11 +21,11 @@ def plot_before_after():
         data = json.load(f)
 
     metrics = {
-        "Peak Memory (MB)": (data["baseline"]["peak_memory_mb"], data["apex_aegis"]["peak_memory_mb"]),
-        "Training Time per Iter (s)": (data["baseline"]["avg_time"], data["apex_aegis"]["avg_time"]),
+        "Peak Memory (MB)": (data["baseline"]["peak_memory_mb"], data["rtx_oom_guard"]["peak_memory_mb"]),
+        "Training Time per Iter (s)": (data["baseline"]["avg_time"], data["rtx_oom_guard"]["avg_time"]),
         "Throughput (iters/s)": (
             data["baseline"].get("throughput_iters_per_sec", 0),
-            data["apex_aegis"].get("throughput_iters_per_sec", 0)
+            data["rtx_oom_guard"].get("throughput_iters_per_sec", 0)
         )
     }
 
@@ -38,10 +38,10 @@ def plot_before_after():
 
     fig, ax = plt.subplots(figsize=(10, 6))
     rects1 = ax.bar(x - width/2, baseline_vals, width, label='Baseline PyTorch', color='#ff7f0e')
-    rects2 = ax.bar(x + width/2, defrag_vals, width, label='apex_aegis', color='#1f77b4')
+    rects2 = ax.bar(x + width/2, defrag_vals, width, label='rtx_oom_guard', color='#1f77b4')
 
     ax.set_ylabel('Scores')
-    ax.set_title('apex-aegis: Baseline vs Proactive Defragmentation')
+    ax.set_title('rtx-oom-guard: Baseline vs Proactive Defragmentation')
     ax.set_xticks(x)
     ax.set_xticklabels(labels)
     ax.legend()

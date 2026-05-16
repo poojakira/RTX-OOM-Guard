@@ -21,10 +21,10 @@ except ImportError:
     HAS_CUDA = False
     DEVICE_NAME = "CPU-Simulated"
 
-from apex_aegis.profiler.allocator_logger import AllocatorLogger
-from apex_aegis.scheduler.risk_model import OOMRiskModel
-from apex_aegis.trainer.training_hook import TrainingHook
-from apex_aegis.defrag_engine.policy import MitigationPolicy
+from rtx_oom_guard.profiler.allocator_logger import AllocatorLogger
+from rtx_oom_guard.scheduler.risk_model import OOMRiskModel
+from rtx_oom_guard.trainer.training_hook import TrainingHook
+from rtx_oom_guard.defrag_engine.policy import MitigationPolicy
 
 # ---------------------------------------------------------------------------
 # Benchmark Utilities
@@ -41,11 +41,11 @@ def get_system_vitals():
 
 def run_experiment(name: str, steps: int = 100, mode: str = "predictive"):
     """
-    Simulated experiment flow for benchmarking Apex-Aegis.
+    Simulated experiment flow for benchmarking rtx-oom-guard.
     Modes: 
       - baseline: No intervention.
       - reactive: Intervene only when fragmentation/risk is critical (>0.9).
-      - predictive: Apex-Aegis proactive intervention based on trend risk.
+      - predictive: rtx-oom-guard proactive intervention based on trend risk.
     """
     logger = AllocatorLogger()
     risk_model = OOMRiskModel()
@@ -82,7 +82,7 @@ def run_experiment(name: str, steps: int = 100, mode: str = "predictive"):
             if frag > 0.85:
                 frag *= 0.7 # Partial relief from cache clearing
         else: # predictive
-            # Apex-Aegis keeps fragmentation low via proactive compaction
+            # rtx-oom-guard keeps fragmentation low via proactive compaction
             frag = 0.15 + 0.05 * np.cos(step / 10.0) + np.random.normal(0, 0.02)
         
         # 3. Determine if OOM would occur
@@ -93,7 +93,7 @@ def run_experiment(name: str, steps: int = 100, mode: str = "predictive"):
             # "Recover" by reducing allocation for the next step (simulating training restart/tail latency)
             allocated *= 0.8
             
-        # 4. Apex-Aegis Hooks
+        # 4. rtx-oom-guard Hooks
         if mode == "predictive":
             risk = hook.on_step_complete(
                 batch_size=8,
@@ -137,7 +137,7 @@ def generate_plots(baseline, reactive, aegis, out_dir):
     plt.figure(figsize=(10, 6))
     plt.plot(baseline["frag_history"], label="Baseline (No Defrag)", color="#e74c3c", alpha=0.8)
     plt.plot(reactive["frag_history"], label="Reactive (Cache Clear)", color="#f1c40f", alpha=0.8)
-    plt.plot(aegis["frag_history"], label="Apex-Aegis (Predictive)", color="#2ecc71", linewidth=2)
+    plt.plot(aegis["frag_history"], label="rtx-oom-guard (Predictive)", color="#2ecc71", linewidth=2)
     plt.axhline(y=0.8, color='gray', linestyle='--', alpha=0.5, label="OOM Danger Zone")
     plt.title("Memory Fragmentation Profiles: Predictive vs Reactive", fontsize=14, fontweight='bold')
     plt.xlabel("Training Steps")
@@ -149,7 +149,7 @@ def generate_plots(baseline, reactive, aegis, out_dir):
 
     # 2. OOM Comparison
     plt.figure(figsize=(8, 5))
-    names = ["Baseline", "Reactive", "Apex-Aegis"]
+    names = ["Baseline", "Reactive", "rtx-oom-guard"]
     ooms = [baseline["oom_errors"], reactive["oom_errors"], aegis["oom_errors"]]
     colors = ["#e74c3c", "#f1c40f", "#2ecc71"]
     bars = plt.bar(names, ooms, color=colors, edgecolor='black', alpha=0.8)
@@ -178,7 +178,7 @@ def generate_plots(baseline, reactive, aegis, out_dir):
 # ---------------------------------------------------------------------------
 
 def main():
-    parser = argparse.ArgumentParser(description="Apex-Aegis Reliability & Utilization Benchmark")
+    parser = argparse.ArgumentParser(description="rtx-oom-guard Reliability & Utilization Benchmark")
     parser.add_argument("--steps", type=int, default=200, help="Steps per run")
     parser.add_argument("--out-dir", default="results", help="Output directory")
     args = parser.parse_args()
@@ -186,7 +186,7 @@ def main():
     out_dir = Path(args.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    print(f"🚀 Initializing Apex-Aegis Infrastructure Benchmark [Hardware: {DEVICE_NAME}]")
+    print(f"🚀 Initializing rtx-oom-guard Infrastructure Benchmark [Hardware: {DEVICE_NAME}]")
     print("-" * 70)
     
     # Run Baseline
@@ -199,9 +199,9 @@ def main():
     reactive = run_experiment("Reactive", steps=args.steps, mode="reactive")
     print(f"DONE [OOMs: {reactive['oom_errors']}]")
     
-    # Run Apex-Aegis
-    print(f"  → Running Apex-Aegis (Active)... ", end="", flush=True)
-    aegis = run_experiment("Apex-Aegis", steps=args.steps, mode="predictive")
+    # Run rtx-oom-guard
+    print(f"  → Running rtx-oom-guard (Active)... ", end="", flush=True)
+    aegis = run_experiment("rtx-oom-guard", steps=args.steps, mode="predictive")
     print(f"DONE [OOMs: {aegis['oom_errors']}]")
 
     # Generate Plots
@@ -215,7 +215,7 @@ def main():
         "metrics": {
             "baseline": baseline,
             "reactive": reactive,
-            "apex_aegis": aegis
+            "rtx_oom_guard": aegis
         },
         "impact": {
             "oom_reduction_vs_baseline": f"{baseline['oom_errors'] - aegis['oom_errors']} errors eliminated",
@@ -239,14 +239,14 @@ def main():
     csv_path = out_dir / "benchmark_infra_summary.csv"
     with open(csv_path, "w", newline="") as f:
         writer = csv.writer(f)
-        writer.writerow(["Metric", "Baseline", "Reactive", "Apex-Aegis", "Peak Impact"])
+        writer.writerow(["Metric", "Baseline", "Reactive", "rtx-oom-guard", "Peak Impact"])
         writer.writerow(["OOM Errors", baseline['oom_errors'], reactive['oom_errors'], aegis['oom_errors'], summary['impact']['oom_reduction_vs_baseline']])
         writer.writerow(["Avg Fragmentation", f"{baseline['avg_fragmentation']:.2f}", f"{reactive['avg_fragmentation']:.2f}", f"{aegis['avg_fragmentation']:.2f}", f"-{round((baseline['avg_fragmentation']-aegis['avg_fragmentation'])/baseline['avg_fragmentation']*100,1)}%"])
         writer.writerow(["Throughput (it/s)", baseline['throughput_it_s'], reactive['throughput_it_s'], aegis['throughput_it_s'], f"+{summary['impact']['throughput_boost_pct']}%"])
     print(f"✅ CSV Summary saved to {csv_path}")
 
     print("\n" + "="*50)
-    print("   APEX-AEGIS INFRA REDUCTION BENCHMARK COMPLETE")
+    print("   rtx-oom-guard INFRA REDUCTION BENCHMARK COMPLETE")
     print("   Visualizations available in: " + str(out_dir))
     print("="*50)
 

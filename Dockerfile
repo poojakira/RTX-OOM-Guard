@@ -1,10 +1,10 @@
-# High-Performance ML Infrastructure: Apex-Aegis
+# High-Performance ML Infrastructure: rtx-oom-guard
 # Optimized for NVIDIA-based GPU Workloads
 
 FROM pytorch/pytorch:2.2.0-cuda12.1-cudnn8-runtime
 
 LABEL maintainer="poojakira"
-LABEL description="Apex-Aegis: Predictive GPU Memory Defragmenter"
+LABEL description="rtx-oom-guard: Predictive GPU Memory Defragmenter"
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1

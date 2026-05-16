@@ -1,6 +1,6 @@
-# 🤝 Contributing to Apex-Aegis
+# 🤝 Contributing to rtx-oom-guard
 
-We welcome contributions from the community to enhance the stability, performance, and observability of **Apex-Aegis**.
+We welcome contributions from the community to enhance the stability, performance, and observability of **rtx-oom-guard**.
 
 ---
 
@@ -53,4 +53,4 @@ python run_benchmark.py --steps 500
 
 ## 🎓 Code of Conduct
 
-Be respectful and professional. Apex-Aegis is a technical project aimed at improving GPU efficiency for the entire community.
+Be respectful and professional. rtx-oom-guard is a technical project aimed at improving GPU efficiency for the entire community.

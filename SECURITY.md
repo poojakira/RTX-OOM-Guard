@@ -1,13 +1,13 @@
-# 🛡️ Apex-Aegis Security Policy
+# 🛡️ rtx-oom-guard Security Policy
 
-Apex-Aegis is an infrastructure-level memory manager that performs physical VRAM repacking. Secure operations are paramount for enterprise clusters.
+rtx-oom-guard is an infrastructure-level memory manager that performs physical VRAM repacking. Secure operations are paramount for enterprise clusters.
 
 ---
 
 ## 🔒 Security Practices
 
 1.  **Memory Isolation**: Triton kernels use raw physical address management but are constrained by individual PyTorch CUDA Streams. This ensures that memory migrations cannot overwrite other active CUDA kernels or standard system memory.
-2.  **Kernel Integrity**: We only execute predefined Triton kernels (compaction_copy, fragmentation_scan). No arbitrary code execution is permitted on the GPU via Apex-Aegis.
+2.  **Kernel Integrity**: We only execute predefined Triton kernels (compaction_copy, fragmentation_scan). No arbitrary code execution is permitted on the GPU via rtx-oom-guard.
 3.  **Encapsulated Telemetry**: The FastAPI server (Telemetry Surface) uses read-only snapshots and JSON telemetry files. It does NOT possess write-access to the GPU or the training process memory pointers.
 
 ---
@@ -21,9 +21,9 @@ Apex-Aegis is an infrastructure-level memory manager that performs physical VRAM
 
 ## 🧪 Vulnerability Reporting
 
-If you discover a security vulnerability in **Apex-Aegis** (e.g., potential data corruption during repacking, memory leak, or API exploit), please send an email to the maintainers:
+If you discover a security vulnerability in **rtx-oom-guard** (e.g., potential data corruption during repacking, memory leak, or API exploit), please send an email to the maintainers:
 
-**Security Contact**: pooja.kiran@apex-aegis.ai
+**Security Contact**: pooja.kiran@rtx-oom-guard.ai
 
 We aim to respond to critical security reports within **24 hours**. Please do NOT open public issues for security vulnerabilities until we have discussed a coordinated disclosure.
 
@@ -31,4 +31,4 @@ We aim to respond to critical security reports within **24 hours**. Please do NO
 
 ## 📄 Compliance
 
-Apex-Aegis is intended for research and production-readiness prototyping. We recommend performing a system-wide security audit before deploying to business-critical environments.
+rtx-oom-guard is intended for research and production-readiness prototyping. We recommend performing a system-wide security audit before deploying to business-critical environments.

@@ -115,8 +115,8 @@
             ],
             "total_compactions": 0
         },
-        "apex_aegis": {
-            "name": "Apex-Aegis",
+        "rtx_oom_guard": {
+            "name": "rtx-oom-guard",
             "oom_count": 0,
             "avg_step_time": 0.0,
             "throughput": 47265.68,

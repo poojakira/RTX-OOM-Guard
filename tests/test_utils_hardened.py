@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import patch, MagicMock
-from apex_aegis.utils import DefragConfig, Timer, get_cuda_info, ensure_cuda, parse_memory_snapshot
+from rtx_oom_guard.utils import DefragConfig, Timer, get_cuda_info, ensure_cuda, parse_memory_snapshot
 
 def test_config_save_load_json(tmp_path):
     """Verify JSON configuration persistence."""

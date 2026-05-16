@@ -1,38 +1,35 @@
-# =============================================================================
-# apex_aegis Configuration
-# =============================================================================
+# rtx_oom_guard Configuration
 # This file controls all tunable parameters for the defragmentation system.
 # Load via: python run.py --config config.yaml
-# =============================================================================
 
-# ── Collector Settings ───────────────────────────────────────────────────────
+# Collector Settings
 poll_interval_ms: 0.1          # Sub-millisecond polling frequency
 max_events: 200000             # Circular buffer cap for allocation events
 
-# ── Predictor Model Settings ────────────────────────────────────────────────
+# Predictor Model Settings
 seq_len: 64                    # Input sequence length (sliding window size)
 hidden_dim: 128                # Transformer hidden dimension
 n_layers: 4                    # Transformer encoder layers
 n_heads: 4                     # Multi-head attention heads
 input_dim: 4                   # Features per allocation event
 
-# ── Monitor Settings ────────────────────────────────────────────────────────
+# Monitor Settings
 monitor_interval_ms: 50.0      # Background prediction frequency (ms)
 frag_threshold: 0.70           # Fragmentation score to trigger compaction
 cooldown_seconds: 1.0          # Minimum time between consecutive defrags
-max_prediction_latency_ms: 5.0 # Kill switch — disable if prediction is too slow
+max_prediction_latency_ms: 5.0 # Kill switch - disable if prediction is too slow
 
-# ── Training Settings ───────────────────────────────────────────────────────
+# Training Settings
 learning_rate: 0.001           # AdamW learning rate
 batch_size: 64                 # Training batch size
 train_epochs: 20               # Number of training epochs
 train_split: 0.8               # Train/validation split ratio
 
-# ── Systems & Infrastructure ────────────────────────────────────────────────
+# Systems & Infrastructure
 ddp_sync: false                # Coordinate compactions across DDP ranks
 async_compaction: false        # Use async memory operations where supported
 
-# ── Paths ───────────────────────────────────────────────────────────────────
+# Paths
 trace_dir: "data/traces"
 checkpoint_path: "checkpoints/predictor.pt"
 results_dir: "results"

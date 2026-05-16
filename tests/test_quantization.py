@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from apex_aegis.optimization.quantization import apply_gpu_quantization, get_model_size_mb
+from rtx_oom_guard.optimization.quantization import apply_gpu_quantization, get_model_size_mb
 
 class SimpleLinear(nn.Module):
     def __init__(self):

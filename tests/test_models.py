@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from apex_aegis.trainer._models import SimpleGPT2, build_gpt2, build_resnet50, build_bert
+from rtx_oom_guard.trainer._models import SimpleGPT2, build_gpt2, build_resnet50, build_bert
 
 def test_simple_gpt2():
     """Verify SimpleGPT2 forward pass and output shape."""

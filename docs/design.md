@@ -1,7 +1,7 @@
 # Experiment Design & Dataset Summary
 
 ## 🏗️ Experiment Overview
-The Apex-Aegis project was designed to address the "Silent Killer" of GPU ROI: memory fragmentation. Our experiments focus on identifying OOM-triggering allocation patterns before they cause process failure.
+The rtx-oom-guard project was designed to address the "Silent Killer" of GPU ROI: memory fragmentation. Our experiments focus on identifying OOM-triggering allocation patterns before they cause process failure.
 
 ### Methodology
 1. **Trace Collection**: We instrumented standard PyTorch training loops (BERT-Base, GPT-2-Small, ResNet-50) using custom CUDA hooks to log every `malloc` and `free` event.

@@ -1,8 +1,8 @@
 import torch
 import time
 from unittest.mock import MagicMock, patch
-from apex_aegis.scheduler.monitor import DefragMonitor
-from apex_aegis.utils import DefragConfig
+from rtx_oom_guard.scheduler.monitor import DefragMonitor
+from rtx_oom_guard.utils import DefragConfig
 
 def test_monitor_trigger_defrag():
     """Verify monitor triggers defrag when frag score exceeds threshold."""
@@ -13,8 +13,8 @@ def test_monitor_trigger_defrag():
     mock_predictor.return_value.item.return_value = 0.8  # Above threshold
     
     # Mock time.perf_counter to ensure latency is low (e.g. 1ms)
-    with patch("apex_aegis.scheduler.monitor.parse_memory_snapshot") as mock_snap, \
-         patch("apex_aegis.scheduler.monitor.torch.from_numpy") as mock_from_numpy, \
+    with patch("rtx_oom_guard.scheduler.monitor.parse_memory_snapshot") as mock_snap, \
+         patch("rtx_oom_guard.scheduler.monitor.torch.from_numpy") as mock_from_numpy, \
          patch("time.perf_counter", side_effect=[1.0, 1.001]), \
          patch("torch.cuda.is_available", return_value=True):
         
@@ -39,8 +39,8 @@ def test_monitor_cooldown():
     
     # Mock time.perf_counter to ensure latency is low everywhere
     # Each call to _predict_and_act uses 2 time.perf_counter calls
-    with patch("apex_aegis.scheduler.monitor.parse_memory_snapshot") as mock_snap, \
-         patch("apex_aegis.scheduler.monitor.torch.from_numpy"), \
+    with patch("rtx_oom_guard.scheduler.monitor.parse_memory_snapshot") as mock_snap, \
+         patch("rtx_oom_guard.scheduler.monitor.torch.from_numpy"), \
          patch("time.perf_counter", side_effect=[1.0, 1.001, 2.0, 2.001]), \
          patch("torch.cuda.is_available", return_value=True):
         
@@ -70,8 +70,8 @@ def test_monitor_kill_switch():
         return MagicMock(item=lambda: 0.1)
     mock_predictor.side_effect = slow_predict
     
-    with patch("apex_aegis.scheduler.monitor.parse_memory_snapshot") as mock_snap, \
-         patch("apex_aegis.scheduler.monitor.torch.from_numpy"), \
+    with patch("rtx_oom_guard.scheduler.monitor.parse_memory_snapshot") as mock_snap, \
+         patch("rtx_oom_guard.scheduler.monitor.torch.from_numpy"), \
          patch("torch.cuda.is_available", return_value=True):
         
         mock_snap.return_value = {"frag_score": 0.1, "total_free": 1000, "total_allocated": 2000, "blocks": []}

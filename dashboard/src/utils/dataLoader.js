@@ -6,8 +6,8 @@
 // TypeError crashes from calling .toFixed() on string values.
 // ============================================================================
 
-// Fetch live telemetry (Real-time polling from apex_aegis backend)
-// Fetch live telemetry (Real-time polling from apex_aegis backend)
+// Fetch live telemetry (Real-time polling from rtx_oom_guard backend)
+// Fetch live telemetry (Real-time polling from rtx_oom_guard backend)
 export const fetchLiveTelemetry = async () => {
   try {
     const response = await fetch('/api/telemetry');

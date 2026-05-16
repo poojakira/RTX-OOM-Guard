@@ -1,10 +1,10 @@
 import json
 from unittest.mock import patch
-from apex_aegis.profiler.allocator_logger import AllocatorLogger, _cuda_available, _mem_stats
+from rtx_oom_guard.profiler.allocator_logger import AllocatorLogger, _cuda_available, _mem_stats
 
 def test_allocator_logger_cuda_unavailable():
     """Verify memory stats when CUDA is explicitly unavailable (Line 41-42)."""
-    with patch("apex_aegis.profiler.allocator_logger._cuda_available", return_value=False):
+    with patch("rtx_oom_guard.profiler.allocator_logger._cuda_available", return_value=False):
         stats = _mem_stats()
         assert stats["allocated"] == 0.0
         assert stats["reserved"] == 0.0

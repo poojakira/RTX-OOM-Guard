@@ -1,6 +1,6 @@
 import torch
 from unittest.mock import MagicMock, patch
-from apex_aegis.scheduler.monitor import DefragMonitor
+from rtx_oom_guard.scheduler.monitor import DefragMonitor
 
 def test_monitor_low_prediction_score():
     """Verify monitor skips defrag if prediction score is low."""
@@ -37,8 +37,8 @@ def test_monitor_load_model_fallback():
     """Verify monitor handles model load failure by falling back to untrained model."""
     mock_predictor = MagicMock()
     # Load fails, but from_config succeeds
-    with patch("apex_aegis.scheduler.monitor.FragPredictor.load", side_effect=Exception("Load fail")), \
-         patch("apex_aegis.scheduler.monitor.FragPredictor.from_config", return_value=mock_predictor), \
+    with patch("rtx_oom_guard.scheduler.monitor.FragPredictor.load", side_effect=Exception("Load fail")), \
+         patch("rtx_oom_guard.scheduler.monitor.FragPredictor.from_config", return_value=mock_predictor), \
          patch("pathlib.Path.exists", return_value=True):
         
         monitor = DefragMonitor(model_path="some/path")

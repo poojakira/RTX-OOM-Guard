@@ -1,7 +1,7 @@
 import torch
 from unittest.mock import MagicMock, patch
-from apex_aegis.scheduler.monitor import DefragMonitor
-from apex_aegis.utils import DefragConfig
+from rtx_oom_guard.scheduler.monitor import DefragMonitor
+from rtx_oom_guard.utils import DefragConfig
 
 def test_monitor_model_loading_branches():
     """Verify monitor handles all model loading fallback paths."""
@@ -9,7 +9,7 @@ def test_monitor_model_loading_branches():
     
     # 1. Load from path (Line 90-92)
     with patch("os.path.exists", return_value=True), \
-         patch("apex_aegis.scheduler.monitor.FragPredictor.load") as mock_load:
+         patch("rtx_oom_guard.scheduler.monitor.FragPredictor.load") as mock_load:
         
         mock_model = MagicMock()
         mock_model.count_parameters.return_value = 100
@@ -22,7 +22,7 @@ def test_monitor_model_loading_branches():
 
     # 2. Fallback to untrained model (Line 107) - Normal behavior since default_weights.py missing
     with patch("os.path.exists", return_value=False), \
-         patch("apex_aegis.scheduler.monitor.FragPredictor.from_config") as mock_untrained:
+         patch("rtx_oom_guard.scheduler.monitor.FragPredictor.from_config") as mock_untrained:
         
         mock_untrained.return_value = MagicMock()
         monitor = DefragMonitor(model_path="nonexistent.pth", config=config)
@@ -36,10 +36,10 @@ def test_monitor_load_model_weights_full():
     fake_module = MagicMock()
     fake_module.DEFAULT_WEIGHTS_B64 = "YmFzZTY0ZGF0YQ==" # "base64data"
     
-    with patch.dict("sys.modules", {"apex_aegis.scheduler.default_weights": fake_module}), \
+    with patch.dict("sys.modules", {"rtx_oom_guard.scheduler.default_weights": fake_module}), \
          patch("os.path.exists", return_value=False), \
          patch("torch.load", return_value={}), \
-         patch("apex_aegis.scheduler.monitor.FragPredictor.from_config") as mock_from_cfg:
+         patch("rtx_oom_guard.scheduler.monitor.FragPredictor.from_config") as mock_from_cfg:
         
         mock_model = MagicMock()
         mock_from_cfg.return_value = mock_model
@@ -62,10 +62,10 @@ def test_monitor_load_model_di():
 def test_monitor_already_running_warning():
     """Verify monitor handles multiple start() calls (Line 120-121)."""
     with patch("torch.cuda.is_available", return_value=False), \
-         patch("apex_aegis.scheduler.monitor.GPUMemoryDefragmenter"):
+         patch("rtx_oom_guard.scheduler.monitor.GPUMemoryDefragmenter"):
         monitor = DefragMonitor()
         monitor.start()
-        with patch("apex_aegis.scheduler.monitor.log") as mock_log:
+        with patch("rtx_oom_guard.scheduler.monitor.log") as mock_log:
             monitor.start()
             assert mock_log.warning.called
         monitor.stop()
@@ -74,7 +74,7 @@ def test_monitor_buffer_full_flag():
     """Verify buffer full flag is set (Line 155)."""
     config = DefragConfig()
     config.seq_len = 2
-    with patch("apex_aegis.scheduler.monitor.GPUMemoryDefragmenter"):
+    with patch("rtx_oom_guard.scheduler.monitor.GPUMemoryDefragmenter"):
         monitor = DefragMonitor(config=config)
         monitor.record_alloc(100)
         monitor.record_alloc(100) # buffer_idx wraps to 0
@@ -85,7 +85,7 @@ def test_monitor_auto_record():
     mock_mem = MagicMock(side_effect=[110, 220, 330, 440]) 
     with patch("torch.cuda.is_available", return_value=True), \
          patch("torch.cuda.memory_allocated", side_effect=mock_mem), \
-         patch("apex_aegis.scheduler.monitor.GPUMemoryDefragmenter"):
+         patch("rtx_oom_guard.scheduler.monitor.GPUMemoryDefragmenter"):
         monitor = DefragMonitor()
         monitor._last_mem = 0
         monitor.auto_record() 
@@ -95,11 +95,11 @@ def test_monitor_auto_record():
 
 def test_monitor_kill_switch_trigger():
     """Verify kill switch triggers when latency is high (Line 216-218)."""
-    with patch("apex_aegis.scheduler.monitor.parse_memory_snapshot") as mock_snap, \
-         patch("apex_aegis.scheduler.monitor.torch.from_numpy"), \
+    with patch("rtx_oom_guard.scheduler.monitor.parse_memory_snapshot") as mock_snap, \
+         patch("rtx_oom_guard.scheduler.monitor.torch.from_numpy"), \
          patch("time.perf_counter", side_effect=[1.0, 1.1]), \
          patch("torch.cuda.is_available", return_value=True), \
-         patch("apex_aegis.scheduler.monitor.GPUMemoryDefragmenter"):
+         patch("rtx_oom_guard.scheduler.monitor.GPUMemoryDefragmenter"):
         
         mock_snap.return_value = {"frag_score": 0.9}
         monitor = DefragMonitor(predictor=MagicMock())

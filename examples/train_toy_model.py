@@ -21,10 +21,10 @@ sys.path.insert(0, str(ROOT))
 import torch
 import torch.nn as nn
 
-from apex_aegis.profiler.allocator_logger import AllocatorLogger
-from apex_aegis.scheduler.risk_model import OOMRiskModel
-from apex_aegis.trainer.training_hook import TrainingHook
-from apex_aegis.defrag_engine.policy import MitigationPolicy
+from rtx_oom_guard.profiler.allocator_logger import AllocatorLogger
+from rtx_oom_guard.scheduler.risk_model import OOMRiskModel
+from rtx_oom_guard.trainer.training_hook import TrainingHook
+from rtx_oom_guard.defrag_engine.policy import MitigationPolicy
 
 
 def main():
@@ -43,7 +43,7 @@ def main():
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
     criterion = nn.CrossEntropyLoss()
 
-    # -- Wire up apex_aegis src modules -------------------------------------
+    # -- Wire up rtx_oom_guard src modules -------------------------------------
     logger = AllocatorLogger()
     risk_model = OOMRiskModel(mode="rule")
     policy = MitigationPolicy(warn_threshold=0.5, act_threshold=0.8)

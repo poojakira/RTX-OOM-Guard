@@ -6,8 +6,8 @@ allowing the user to see the dashboard respond in real-time.
 
 import time
 import torch # type: ignore
-from apex_aegis import DefragMonitor # type: ignore
-from apex_aegis.utils import DefragConfig, get_logger # type: ignore
+from rtx_oom_guard import DefragMonitor # type: ignore
+from rtx_oom_guard.utils import DefragConfig, get_logger # type: ignore
 
 log = get_logger("live-demo")
 

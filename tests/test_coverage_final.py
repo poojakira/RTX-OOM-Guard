@@ -1,11 +1,11 @@
 import torch
 import time
 from unittest.mock import MagicMock, patch
-from apex_aegis.defrag_engine.defragmenter import GPUMemoryDefragmenter
-from apex_aegis.defrag_engine.policy import MitigationPolicy
-from apex_aegis.defrag_engine.benchmark_triton import run_benchmark
+from rtx_oom_guard.defrag_engine.defragmenter import GPUMemoryDefragmenter
+from rtx_oom_guard.defrag_engine.policy import MitigationPolicy
+from rtx_oom_guard.defrag_engine.benchmark_triton import run_benchmark
 from fastapi.testclient import TestClient
-from apex_aegis.api import app
+from rtx_oom_guard.api import app
 
 def test_api_spa_fallback():
     """Verify that the API falls back to the SPA index for unknown routes."""
@@ -36,7 +36,7 @@ def test_defragmenter_telemetry_persistence(tmp_path):
 def test_defragmenter_triton_repack_branch():
     """Verify Triton path in defragment_tensors."""
     with patch("torch.cuda.is_available", return_value=True), \
-         patch("apex_aegis.defrag_engine.defragmenter.triton_compaction_copy") as mock_kernel, \
+         patch("rtx_oom_guard.defrag_engine.defragmenter.triton_compaction_copy") as mock_kernel, \
          patch("torch.empty") as mock_empty:
         
         # Use a mock tensor that supports .view and .data
@@ -52,7 +52,7 @@ def test_defragmenter_triton_repack_branch():
         
         engine = GPUMemoryDefragmenter(use_triton=True)
         # Force HAS_TRITON to True for the test
-        with patch("apex_aegis.defrag_engine.defragmenter.HAS_TRITON", True):
+        with patch("rtx_oom_guard.defrag_engine.defragmenter.HAS_TRITON", True):
             engine.use_triton = True
             engine.defragment_tensors([mock_tensor], reason="test_triton")
             
@@ -72,18 +72,18 @@ def test_policy_edge_cases():
 
 def test_benchmark_triton_mocked():
     """Cover benchmark code paths by manually injecting the mock kernel."""
-    import apex_aegis.defrag_engine.benchmark_triton as benchmark_triton
+    import rtx_oom_guard.defrag_engine.benchmark_triton as benchmark_triton
     
     # Manually set the attribute if missing due to import failure
     if not hasattr(benchmark_triton, 'triton_compaction_copy'):
         setattr(benchmark_triton, 'triton_compaction_copy', MagicMock())
 
     with patch("torch.cuda.is_available", return_value=True), \
-         patch("apex_aegis.defrag_engine.benchmark_triton.TRITON_AVAILABLE", True), \
-         patch("apex_aegis.defrag_engine.benchmark_triton.triton_compaction_copy") as mock_triton, \
-         patch("apex_aegis.defrag_engine.benchmark_triton.torch.randn"), \
-         patch("apex_aegis.defrag_engine.benchmark_triton.torch.empty_like"), \
-         patch("apex_aegis.defrag_engine.benchmark_triton.torch.cuda.synchronize"):
+         patch("rtx_oom_guard.defrag_engine.benchmark_triton.TRITON_AVAILABLE", True), \
+         patch("rtx_oom_guard.defrag_engine.benchmark_triton.triton_compaction_copy") as mock_triton, \
+         patch("rtx_oom_guard.defrag_engine.benchmark_triton.torch.randn"), \
+         patch("rtx_oom_guard.defrag_engine.benchmark_triton.torch.empty_like"), \
+         patch("rtx_oom_guard.defrag_engine.benchmark_triton.torch.cuda.synchronize"):
         
         run_benchmark()
         assert True

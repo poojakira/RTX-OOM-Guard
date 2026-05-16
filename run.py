@@ -2,7 +2,7 @@
 run.py
 ======
 
-Unified execution CLI for the apex_aegis NVIDIA-grade ML infrastructure.
+Unified execution CLI for the rtx_oom_guard ML infrastructure.
 Wraps the entire system behind a clean, config-driven pipeline.
 
 Usage:
@@ -14,9 +14,9 @@ import sys
 import os
 import yaml
 
-from apex_aegis.utils import DefragConfig
-from apex_aegis.scheduler.monitor import DefragMonitor
-from apex_aegis.utils import get_logger
+from rtx_oom_guard.utils import DefragConfig
+from rtx_oom_guard.scheduler.monitor import DefragMonitor
+from rtx_oom_guard.utils import get_logger
 
 log = get_logger("infra_runner")
 

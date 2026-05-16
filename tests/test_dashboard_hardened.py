@@ -1,5 +1,5 @@
 from unittest.mock import patch, MagicMock
-from apex_aegis.dashboard import DashboardManager
+from rtx_oom_guard.dashboard import DashboardManager
 
 def test_dashboard_manager_ensure_dirs(tmp_path):
     """Verify directory creation is handled correctly."""
@@ -14,7 +14,7 @@ def test_dashboard_manager_vite_start_failure(tmp_path):
     (tmp_path / "dashboard" / "node_modules").mkdir(parents=True)
     
     with patch("subprocess.Popen", side_effect=Exception("Spawn Fail")), \
-         patch("apex_aegis.dashboard.log") as mock_log:
+         patch("rtx_oom_guard.dashboard.log") as mock_log:
         mgr.start_dashboard()
         assert mock_log.error.called
 
@@ -32,10 +32,10 @@ def test_dashboard_manager_stop_sync_runtime_error(tmp_path):
 
 def test_dashboard_main_entrypoint():
     """Verify dashboard main entrypoint (Line 121)."""
-    with patch("apex_aegis.dashboard.DashboardManager") as mock_mgr_class, \
-         patch("apex_aegis.dashboard.log") as mock_log, \
+    with patch("rtx_oom_guard.dashboard.DashboardManager") as mock_mgr_class, \
+         patch("rtx_oom_guard.dashboard.log") as mock_log, \
          patch("time.sleep", side_effect=KeyboardInterrupt):
-        from apex_aegis.dashboard import main
+        from rtx_oom_guard.dashboard import main
         main()
         assert mock_mgr_class.return_value.start_sync.called
         assert mock_mgr_class.return_value.stop_sync.called

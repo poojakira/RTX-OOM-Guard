@@ -1,4 +1,4 @@
-from apex_aegis.llm_system.kv_cache_manager import PagedKVCacheAdapter
+from rtx_oom_guard.llm_system.kv_cache_manager import PagedKVCacheAdapter
 
 def test_paged_kv_cache_adapter():
     adapter = PagedKVCacheAdapter(num_blocks=100, block_size=16, block_byte_size=1048576)

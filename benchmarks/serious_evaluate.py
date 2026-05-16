@@ -3,7 +3,7 @@ benchmark.serious_evaluate
 ==========================
 
 Rigorous benchmarking script running 5 distinct trials to measure the impact of
-apex_aegis vs vanilla PyTorch on identical workloads.
+rtx_oom_guard vs vanilla PyTorch on identical workloads.
 
 Generates:
 1. Console table
@@ -19,7 +19,7 @@ import statistics
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from apex_aegis.utils import get_logger
+from rtx_oom_guard.utils import get_logger
 
 log = get_logger("serious_evaluate")
 
@@ -51,7 +51,7 @@ def run_serious_benchmarks(n_trials=5, iterations_per_trial=100):
         results_baseline.append(base_res)
         
         # 2. Defrag
-        log.info("Running apex_aegis...")
+        log.info("Running rtx_oom_guard...")
         torch.cuda.empty_cache()
         torch.cuda.reset_peak_memory_stats()
         defrag_res = run_benchmark_with_defrag(iterations_per_trial)
@@ -76,7 +76,7 @@ def run_serious_benchmarks(n_trials=5, iterations_per_trial=100):
     csv_file = "results/experiments_table.csv"
     with open(csv_file, "w", newline="") as f:
         writer = csv.writer(f)
-        writer.writerow(["Metric", "Baseline (Mean ± Std)", "apex_aegis (Mean ± Std)", "Improvement"])
+        writer.writerow(["Metric", "Baseline (Mean ± Std)", "rtx_oom_guard (Mean ± Std)", "Improvement"])
         
         oom_imp = ((b_oom_mean - d_oom_mean) / max(b_oom_mean, 0.001)) * 100
         time_imp = ((b_time_mean - d_time_mean) / b_time_mean) * 100
@@ -92,7 +92,7 @@ def run_serious_benchmarks(n_trials=5, iterations_per_trial=100):
     print("=" * 60)
     print("SERIOUS EVALUATION RESULTS (N=5 Trials)")
     print("=" * 60)
-    print(f"{'Metric':<20} | {'Baseline':<15} | {'apex_aegis':<15} | {'Improvement':<10}")
+    print(f"{'Metric':<20} | {'Baseline':<15} | {'rtx_oom_guard':<15} | {'Improvement':<10}")
     print("-" * 60)
     print(f"{'OOM Errors':<20} | {b_oom_mean:<15.1f} | {d_oom_mean:<15.1f} | {oom_imp:.1f}%")
     print(f"{'Iteration Time (s)':<20} | {b_time_mean:<15.3f} | {d_time_mean:<15.3f} | {time_imp:.1f}%")
@@ -115,7 +115,7 @@ def run_serious_benchmarks(n_trials=5, iterations_per_trial=100):
 
         fig, ax = plt.subplots(figsize=(10, 6))
         rects1 = ax.bar(x - width/2, b_means, width, label='Vanilla PyTorch', color='#ff7f0e')
-        rects2 = ax.bar(x + width/2, d_means, width, label='apex_aegis', color='#1f77b4')
+        rects2 = ax.bar(x + width/2, d_means, width, label='rtx_oom_guard', color='#1f77b4')
 
         ax.set_ylabel('Value')
         ax.set_title(f'Performance Comparison (Average across {n_trials} trials)')

@@ -1,7 +1,7 @@
 """
 benchmarks/unified_benchmark.py
 ==============================
-A comprehensive benchmark comparing Baseline PyTorch to Apex-Aegis 
+A comprehensive benchmark comparing Baseline PyTorch to rtx-oom-guard 
 under synthetic fragmentation pressure.
 
 Metrics captured:
@@ -37,12 +37,12 @@ except ImportError:
     HAS_CUDA = False
     DEVICE_NAME = "CPU-Simulated"
 
-# Apex-Aegis Imports
-from apex_aegis.profiler.allocator_logger import AllocatorLogger
-from apex_aegis.scheduler.risk_model import OOMRiskModel
-from apex_aegis.trainer.training_hook import TrainingHook
-from apex_aegis.defrag_engine.policy import MitigationPolicy
-from apex_aegis.trainer._models import SimpleGPT2
+# rtx-oom-guard Imports
+from rtx_oom_guard.profiler.allocator_logger import AllocatorLogger
+from rtx_oom_guard.scheduler.risk_model import OOMRiskModel
+from rtx_oom_guard.trainer.training_hook import TrainingHook
+from rtx_oom_guard.defrag_engine.policy import MitigationPolicy
+from rtx_oom_guard.trainer._models import SimpleGPT2
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 log = logging.getLogger("unified_benchmark")
@@ -114,7 +114,7 @@ def run_experiment(name: str, iterations: int = 100, use_defrag: bool = True):
                 oom_count += 1
                 torch.cuda.empty_cache() if HAS_CUDA else None
         else:
-            # Apex-Aegis proactively compacts
+            # rtx-oom-guard proactively compacts
             frag = 0.12 + 0.08 * np.sin(step / 10.0) + np.random.normal(0, 0.02)
             util = 0.94 + np.random.normal(0, 0.01)
             
@@ -157,24 +157,24 @@ def run_experiment(name: str, iterations: int = 100, use_defrag: bool = True):
 def generate_plots(baseline, aegis, out_dir: Path):
     plt.style.use('ggplot')
     fig, axes = plt.subplots(2, 2, figsize=(15, 12))
-    plt.suptitle(f"Apex-Aegis Performance Report [{DEVICE_NAME}]", fontsize=20, fontweight='bold')
+    plt.suptitle(f"rtx-oom-guard Performance Report [{DEVICE_NAME}]", fontsize=20, fontweight='bold')
 
     # 1. Throughput Comparison
-    axes[0, 0].bar(["Baseline", "Apex-Aegis"], [baseline["throughput"], aegis["throughput"]], color=['#e74c3c', '#2ecc71'])
+    axes[0, 0].bar(["Baseline", "rtx-oom-guard"], [baseline["throughput"], aegis["throughput"]], color=['#e74c3c', '#2ecc71'])
     axes[0, 0].set_title("Training Throughput (it/s)", fontsize=14)
     axes[0, 0].set_ylabel("Iterations per second")
     for i, v in enumerate([baseline["throughput"], aegis["throughput"]]):
         axes[0, 0].text(i, v + 0.1, str(v), ha='center', fontsize=12, fontweight='bold')
 
     # 2. OOM Rate
-    axes[0, 1].bar(["Baseline", "Apex-Aegis"], [baseline["oom_count"], aegis["oom_count"]], color=['#c0392b', '#27ae60'])
+    axes[0, 1].bar(["Baseline", "rtx-oom-guard"], [baseline["oom_count"], aegis["oom_count"]], color=['#c0392b', '#27ae60'])
     axes[0, 1].set_title("OOM Errors Experienced", fontsize=14)
     axes[0, 1].set_ylabel("Count")
     for i, v in enumerate([baseline["oom_count"], aegis["oom_count"]]):
         axes[0, 1].text(i, v + 0.1, str(v), ha='center', fontsize=12, fontweight='bold')
 
     # 3. GPU Utilization
-    axes[1, 0].bar(["Baseline", "Apex-Aegis"], [baseline["avg_utilization"], aegis["avg_utilization"]], color=['#f1c40f', '#3498db'])
+    axes[1, 0].bar(["Baseline", "rtx-oom-guard"], [baseline["avg_utilization"], aegis["avg_utilization"]], color=['#f1c40f', '#3498db'])
     axes[1, 0].set_title("Avg GPU Utilization (%)", fontsize=14)
     axes[1, 0].set_ylabel("Utilization %")
     axes[1, 0].set_ylim(0, 100)
@@ -183,7 +183,7 @@ def generate_plots(baseline, aegis, out_dir: Path):
 
     # 4. Fragmentation Trend
     axes[1, 1].plot(baseline["frag_history"], label="Baseline", color='#e67e22', alpha=0.8, linewidth=2)
-    axes[1, 1].plot(aegis["frag_history"], label="Apex-Aegis", color='#2980b9', alpha=0.9, linewidth=3)
+    axes[1, 1].plot(aegis["frag_history"], label="rtx-oom-guard", color='#2980b9', alpha=0.9, linewidth=3)
     axes[1, 1].set_title("Fragmentation Ratio Over Time", fontsize=14)
     axes[1, 1].set_xlabel("Training Step")
     axes[1, 1].set_ylabel("Fragmentation %")
@@ -208,15 +208,15 @@ def main():
     out_dir.mkdir(parents=True, exist_ok=True)
 
     log.info("="*60)
-    log.info(f"Starting Apex-Aegis Unified Benchmark Suite")
+    log.info(f"Starting rtx-oom-guard Unified Benchmark Suite")
     log.info(f"Environment: {DEVICE_NAME}")
     log.info("="*60)
 
     # 1. Baseline
     baseline_results = run_experiment("Baseline", iterations=args.iterations, use_defrag=False)
     
-    # 2. Apex-Aegis
-    aegis_results = run_experiment("Apex-Aegis", iterations=args.iterations, use_defrag=True)
+    # 2. rtx-oom-guard
+    aegis_results = run_experiment("rtx-oom-guard", iterations=args.iterations, use_defrag=True)
 
     # 3. Summary
     comparison = {
@@ -227,7 +227,7 @@ def main():
         },
         "metrics": {
             "baseline": baseline_results,
-            "apex_aegis": aegis_results
+            "rtx_oom_guard": aegis_results
         },
         "improvements": {
             "throughput_gain_pct": round(((aegis_results["throughput"] - baseline_results["throughput"]) / baseline_results["throughput"]) * 100, 2),

@@ -1,5 +1,5 @@
 from unittest.mock import MagicMock, patch
-from apex_aegis.llm_system.kv_cache_manager import PagedKVCacheAdapter
+from rtx_oom_guard.llm_system.kv_cache_manager import PagedKVCacheAdapter
 
 def test_kv_cache_initialization():
     """Verify KV cache initialization with physical memory handles."""
@@ -11,7 +11,7 @@ def test_kv_cache_allocate_oom():
     """Verify OOM risk handling when blocks are unavailable (Line 38-39)."""
     adapter = PagedKVCacheAdapter(num_blocks=1, block_size=16, block_byte_size=1024)
     # Attempt to allocate 2 blocks when only 1 exists
-    with patch("apex_aegis.llm_system.kv_cache_manager.log") as mock_log:
+    with patch("rtx_oom_guard.llm_system.kv_cache_manager.log") as mock_log:
         success = adapter.allocate(sequence_id=42, num_blocks=2)
         assert success is False
         assert mock_log.warning.called

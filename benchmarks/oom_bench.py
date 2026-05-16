@@ -31,8 +31,8 @@ import mlflow  # type: ignore
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from apex_aegis.trainer.callback import DefragCallback   # type: ignore
-from apex_aegis.utils import get_logger          # type: ignore
+from rtx_oom_guard.trainer.callback import DefragCallback   # type: ignore
+from rtx_oom_guard.utils import get_logger          # type: ignore
 
 log = get_logger("oom_bench")
 

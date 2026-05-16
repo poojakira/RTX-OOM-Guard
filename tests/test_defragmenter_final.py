@@ -1,7 +1,7 @@
 import pytest
 import torch
 from unittest.mock import patch
-from apex_aegis.defrag_engine.defragmenter import GPUMemoryDefragmenter
+from rtx_oom_guard.defrag_engine.defragmenter import GPUMemoryDefragmenter
 
 def test_defragmenter_persistence_io_error(tmp_path):
     """Verify defragmenter handles IO errors during telemetry persistence."""
@@ -19,8 +19,8 @@ def test_defragmenter_no_matching_tensors():
 
 def test_defragmenter_triton_missing_warning():
     """Verify behavior when Triton kernels are missing."""
-    with patch("apex_aegis.defrag_engine.defragmenter.HAS_TRITON", False), \
-         patch("apex_aegis.defrag_engine.defragmenter.log") as mock_log:
+    with patch("rtx_oom_guard.defrag_engine.defragmenter.HAS_TRITON", False), \
+         patch("rtx_oom_guard.defrag_engine.defragmenter.log") as mock_log:
         engine = GPUMemoryDefragmenter(use_triton=True)
         # triton_compaction_copy should now be the dummy one that raises RuntimeError
         t1 = torch.randn(10)

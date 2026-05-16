@@ -2,8 +2,8 @@
 
 import torch
 
-from apex_aegis.predictor.model import FragPredictor
-from apex_aegis.utils import DefragConfig
+from rtx_oom_guard.predictor.model import FragPredictor
+from rtx_oom_guard.utils import DefragConfig
 
 
 class TestFragPredictor:

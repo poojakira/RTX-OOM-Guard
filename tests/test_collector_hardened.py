@@ -2,8 +2,8 @@ import torch
 import pytest
 import pandas as pd
 from unittest.mock import MagicMock, patch
-from apex_aegis.profiler.collector import AllocationCollector, collect_from_model
-from apex_aegis.utils import DefragConfig
+from rtx_oom_guard.profiler.collector import AllocationCollector, collect_from_model
+from rtx_oom_guard.utils import DefragConfig
 
 def test_collector_circular_buffer():
     """Verify that the collector respects max_events and clears old ones."""
@@ -55,7 +55,7 @@ def test_collector_save_load(tmp_path):
     ]
     
     path = tmp_path / "test_trace.parquet"
-    with patch("apex_aegis.profiler.collector.log"):
+    with patch("rtx_oom_guard.profiler.collector.log"):
         collector.save(str(path))
     
     assert path.exists()
@@ -71,7 +71,7 @@ def test_collect_from_model_mocked():
          patch("torch.cuda.memory_allocated", side_effect=count(step=100)), \
          patch("torch.cuda.memory_reserved", return_value=10000), \
          patch("torch.cuda.synchronize"), \
-         patch("apex_aegis.trainer._models.build_gpt2") as mock_build:
+         patch("rtx_oom_guard.trainer._models.build_gpt2") as mock_build:
         
         mock_model = MagicMock(spec=torch.nn.Module)
         mock_model.parameters.return_value = [torch.nn.Parameter(torch.randn(1))]

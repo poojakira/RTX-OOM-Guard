@@ -1,7 +1,7 @@
 import pytest
 import pandas as pd
-from apex_aegis.scheduler.dataset import AllocationDataset, create_dataloaders
-from apex_aegis.utils import DefragConfig
+from rtx_oom_guard.scheduler.dataset import AllocationDataset, create_dataloaders
+from rtx_oom_guard.utils import DefragConfig
 
 def test_dataset_skipping_logic(tmp_path):
     """Verify dataset skips corrupt or short files (Line 53, 59)."""

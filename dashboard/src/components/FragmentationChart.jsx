@@ -38,7 +38,7 @@ export const FragmentationChart = ({ data, timeline }) => {
         />
         <Line 
           type="stepAfter" 
-          name="apex_aegis" 
+          name="rtx_oom_guard" 
           dataKey="defragFrag" 
           stroke="#00ff88" 
           strokeWidth={2}

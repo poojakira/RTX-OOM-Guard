@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 import numpy as np
-from apex_aegis.profiler.collector import AllocationCollector
+from rtx_oom_guard.profiler.collector import AllocationCollector
 
 def generate_traces():
     trace_dir = ROOT / "data" / "traces"

@@ -1,3 +1,3 @@
 """
-apex_aegis benchmarks — Performance evaluation suite.
+rtx_oom_guard benchmarks — Performance evaluation suite.
 """

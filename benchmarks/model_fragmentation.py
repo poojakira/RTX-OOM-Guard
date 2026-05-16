@@ -26,8 +26,8 @@ import mlflow
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from apex_aegis.trainer.callback import DefragCallback
-from apex_aegis.utils import get_logger, parse_memory_snapshot, DefragConfig
+from rtx_oom_guard.trainer.callback import DefragCallback
+from rtx_oom_guard.utils import get_logger, parse_memory_snapshot, DefragConfig
 
 log = get_logger("model_fragmentation")
 

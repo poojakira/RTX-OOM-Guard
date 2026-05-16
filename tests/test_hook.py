@@ -5,9 +5,9 @@ tests/test_hook.py — Prove the TrainingHook actually runs.
 import torch
 import torch.nn as nn
 
-from apex_aegis.trainer.training_hook import TrainingHook
-from apex_aegis.profiler.allocator_logger import AllocatorLogger
-from apex_aegis.scheduler.risk_model import OOMRiskModel
+from rtx_oom_guard.trainer.training_hook import TrainingHook
+from rtx_oom_guard.profiler.allocator_logger import AllocatorLogger
+from rtx_oom_guard.scheduler.risk_model import OOMRiskModel
 
 
 class TestTrainingHook:

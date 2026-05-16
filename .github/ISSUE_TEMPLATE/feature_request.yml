@@ -48,5 +48,5 @@ body:
       options:
         - label: I have searched for existing feature requests.
           required: true
-        - label: This feature request is within the scope of Apex-Aegis.
+        - label: This feature request is within the scope of rtx-oom-guard.
           required: true

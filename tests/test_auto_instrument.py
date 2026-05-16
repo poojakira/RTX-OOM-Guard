@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from apex_aegis.trainer.auto_instrument import auto_instrument, _InstrumentedModel
+from rtx_oom_guard.trainer.auto_instrument import auto_instrument, _InstrumentedModel
 
 class DummyModel(nn.Module):
     def __init__(self):

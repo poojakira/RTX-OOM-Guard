@@ -25,8 +25,8 @@
             "throughput_it_s": 0.92,
             "total_interventions": 178
         },
-        "apex_aegis": {
-            "name": "Apex-Aegis",
+        "rtx_oom_guard": {
+            "name": "rtx-oom-guard",
             "oom_errors": 0,
             "avg_fragmentation": 0.148,
             "peak_fragmentation": 0.244,

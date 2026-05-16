@@ -53,7 +53,7 @@ function App() {
     const interval = setInterval(() => {
       fetchLiveTelemetry().then(metrics => {
         setLiveState(prev => {
-          // ── BACKEND CONNECTED: Real telemetry from apex_aegis engine ──
+          // ── BACKEND CONNECTED: Real telemetry from rtx_oom_guard engine ──
           if (metrics) {
             const realFrag = metrics.currentFrag;
             const prevHistoryLen = prev.history ? prev.history.length : 0;

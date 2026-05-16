@@ -1,6 +1,6 @@
 {
   "timestamp": "2026-04-02T01:36:12Z",
-  "system": "apex_aegis",
+  "system": "rtx_oom_guard",
   "oom_errors": 0,
   "restarts": 0,
   "avg_iteration_time": 1.76,

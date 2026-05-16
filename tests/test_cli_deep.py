@@ -1,25 +1,25 @@
 from unittest.mock import MagicMock, patch
-from apex_aegis.cli import main
+from rtx_oom_guard.cli import main
 
 def test_cli_simulate_subcommand():
     """Verify simulation subcommand flow."""
-    with patch("sys.argv", ["apex_aegis", "simulate", "--steps", "1"]), \
+    with patch("sys.argv", ["rtx_oom_guard", "simulate", "--steps", "1"]), \
          patch("benchmarks.run_local_benchmark.main") as mock_bench:
         main()
         assert mock_bench.called
 
 def test_cli_profile_subcommand():
     """Verify profiling subcommand flow."""
-    with patch("sys.argv", ["apex_aegis", "profile", "--iterations", "1"]), \
-         patch("apex_aegis.profiler.collector.collect_from_model") as mock_collect:
+    with patch("sys.argv", ["rtx_oom_guard", "profile", "--iterations", "1"]), \
+         patch("rtx_oom_guard.profiler.collector.collect_from_model") as mock_collect:
         main()
         assert mock_collect.called
 
 def test_cli_profile_error_branch():
     """Verify profiling error handling."""
-    with patch("sys.argv", ["apex_aegis", "profile", "--model", "gpt2"]), \
-         patch("apex_aegis.profiler.collector.collect_from_model", side_effect=ValueError("Profile Fail")), \
-         patch("apex_aegis.cli._print") as mock_print:
+    with patch("sys.argv", ["rtx_oom_guard", "profile", "--model", "gpt2"]), \
+         patch("rtx_oom_guard.profiler.collector.collect_from_model", side_effect=ValueError("Profile Fail")), \
+         patch("rtx_oom_guard.cli._print") as mock_print:
         main()
         assert any("Profile Fail" in str(args[0]) for args in mock_print.call_args_list)
 
@@ -32,7 +32,7 @@ def test_cli_status_command_mocked():
         if "dashboard" in path_str: return False # Trigger 293
         return True 
         
-    with patch("sys.argv", ["apex_aegis", "status"]), \
+    with patch("sys.argv", ["rtx_oom_guard", "status"]), \
          patch("torch.cuda.is_available", return_value=True), \
          patch("torch.cuda.get_device_name", return_value="NVIDIA-MOCK-A100"), \
          patch("torch.version.cuda", "12.2"), \
@@ -41,9 +41,9 @@ def test_cli_status_command_mocked():
 
 def test_cli_dashboard_drain_and_exit():
     """Verify dashboard output draining and exit sequence (Lines 180-183, 199-203)."""
-    from apex_aegis.cli import dashboard_cmd
+    from rtx_oom_guard.cli import dashboard_cmd
 
-    with patch("sys.argv", ["apex_aegis-dashboard"]), \
+    with patch("sys.argv", ["rtx_oom_guard-dashboard"]), \
          patch("subprocess.Popen") as mock_popen, \
          patch("time.sleep", side_effect=[None, None, KeyboardInterrupt]), \
          patch("webbrowser.open"):
@@ -61,8 +61,8 @@ def test_cli_dashboard_drain_and_exit():
 
 def test_cli_no_rich_fallback():
     """Verify fallback when rich is missing (Line 32-34, 43-45, 53)."""
-    from apex_aegis.cli import _print, print_banner
-    with patch("apex_aegis.cli.HAS_RICH", False), \
+    from rtx_oom_guard.cli import _print, print_banner
+    with patch("rtx_oom_guard.cli.HAS_RICH", False), \
          patch("builtins.print") as mock_print:
         print_banner()
         _print("test message")
@@ -72,11 +72,11 @@ def test_cli_main_entrypoint_dunder():
     """Verify the module-level main() call at Line 351."""
     # We can't easily trigger the 'if __name__ == "__main__"' block 
     # but we can call it after mocking sys.argv to ensure it doesn't crash.
-    with patch("sys.argv", ["apex_aegis", "--help"]), \
+    with patch("sys.argv", ["rtx_oom_guard", "--help"]), \
          patch("argparse.ArgumentParser.parse_args", side_effect=SystemExit(0)):
         try:
             # Re-running the entry point section
-            from apex_aegis import cli
+            from rtx_oom_guard import cli
             cli.main()
         except SystemExit:
             pass

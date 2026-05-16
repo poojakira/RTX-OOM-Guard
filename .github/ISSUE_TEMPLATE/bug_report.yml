@@ -1,5 +1,5 @@
 name: 🐛 Bug Report
-description: Report a bug to help us improve Apex-Aegis
+description: Report a bug to help us improve rtx-oom-guard
 title: "[BUG]: "
 labels: ["bug", "triage"]
 body:
@@ -21,7 +21,7 @@ body:
       label: Reproduction Steps
       description: How can we reproduce this bug?
       placeholder: |
-        1. Install apex-aegis
+        1. Install rtx-oom-guard
         2. Run `python run_benchmark.py --config config.yaml`
         3. See error...
     validations:

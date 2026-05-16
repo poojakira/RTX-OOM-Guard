@@ -16,7 +16,7 @@ To solve this, we require an infrastructural orchestrator that predicts topologi
 
 ## 2. System Architecture
 
-To meet production ML infrastructure requirements, "apex_aegis" is separated into precise subcomponents:
+To meet production ML infrastructure requirements, "rtx_oom_guard" is separated into precise subcomponents:
 
 ```mermaid
 graph LR
@@ -48,7 +48,7 @@ We subjected the infrastructure to a rigorous Multi-Trial Benchmark workload con
 
 ### Empirical Data
 
-| Metric | Baseline (Mean ± Std) | apex_aegis (Mean ± Std) | Delta |
+| Metric | Baseline (Mean ± Std) | rtx_oom_guard (Mean ± Std) | Delta |
 |--------|-----------------------|-------------------------|-------|
 | OOM Errors | `4.0 ± 0.3` | `0.0 ± 0.0` | 100% Elimination | 
 | Iteration Latency | `1.94s ± 0.05` | `1.76s ± 0.03` | 10% Speedup |

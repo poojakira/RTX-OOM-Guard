@@ -1,7 +1,7 @@
 """
 tests/conftest.py — Shared test configuration and fixtures.
 
-Ensures the project root is on sys.path so tests can import apex_aegis
+Ensures the project root is on sys.path so tests can import rtx_oom_guard
 and scripts without per-file path manipulation.
 """
 

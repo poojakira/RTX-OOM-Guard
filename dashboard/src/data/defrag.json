@@ -1,6 +1,6 @@
 {
   "timestamp": "2026-03-30T14:00:00",
-  "system": "apex_aegis (ResNet50 Real)",
+  "system": "rtx_oom_guard (ResNet50 Real)",
   "oom_errors": 0,
   "restarts": 0,
   "compactions": 12,

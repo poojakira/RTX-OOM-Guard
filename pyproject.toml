@@ -3,14 +3,14 @@ requires = ["setuptools>=68.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "apex-aegis"
+name = "rtx-oom-guard"
 version = "2.0.0"
 description = "NVIDIA-Grade Predictive GPU Memory Defragmenter — Transformer-driven proactive CUDA memory infrastructure"
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.10"
 authors = [
-    {name = "Apex-Aegis Infrastructure Team"}
+    {name = "RTX-OOM-Guard Infrastructure Team"}
 ]
 keywords = ["gpu", "cuda", "memory", "defragmentation", "pytorch", "transformer", "observability"]
 classifiers = [
@@ -44,19 +44,19 @@ models = ["torchvision>=0.15", "transformers>=4.30"]
 profiler = ["torch-tb-profiler>=0.4"]
 triton = ["triton>=2.1.0"]
 rich = ["rich>=13.0"]
-all = ["apex-aegis[dev,models,profiler,triton,rich]"]
+all = ["rtx-oom-guard[dev,models,profiler,triton,rich]"]
 
 [project.scripts]
-apex-aegis = "apex_aegis.cli:main"
-apex-collect = "apex_aegis.cli:collect_cmd"
-apex-train = "apex_aegis.cli:train_cmd"
-apex-benchmark = "apex_aegis.cli:benchmark_cmd"
-apex-serve = "apex_aegis.cli:serve_cmd"
-apex-dashboard = "apex_aegis.cli:dashboard_cmd"
+rtx-oom-guard = "rtx_oom_guard.cli:main"
+rtx-collect = "rtx_oom_guard.cli:collect_cmd"
+rtx-train = "rtx_oom_guard.cli:train_cmd"
+rtx-benchmark = "rtx_oom_guard.cli:benchmark_cmd"
+rtx-serve = "rtx_oom_guard.cli:serve_cmd"
+rtx-dashboard = "rtx_oom_guard.cli:dashboard_cmd"
 
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["apex_aegis*"]
+include = ["rtx_oom_guard*"]
 
 [tool.black]
 line-length = 100
@@ -67,5 +67,5 @@ target-version = "py310"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-v --tb=short --cov=apex_aegis --cov-report=term-missing --cov-fail-under=95"
+addopts = "-v --tb=short --cov=rtx_oom_guard --cov-report=term-missing --cov-fail-under=95"
 pythonpath = ["src"]

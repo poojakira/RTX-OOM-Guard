@@ -1,5 +1,5 @@
 from unittest.mock import MagicMock, patch
-from apex_aegis.defrag_engine.policy import MitigationPolicy
+from rtx_oom_guard.defrag_engine.policy import MitigationPolicy
 
 def test_mitigation_policy_scenarios():
     """Verify MitigationPolicy triggers correct actions for risk tiers."""
@@ -11,7 +11,7 @@ def test_mitigation_policy_scenarios():
     assert not action.cache_cleared
     
     # WARN
-    with patch("apex_aegis.defrag_engine.policy.log") as mock_log:
+    with patch("rtx_oom_guard.defrag_engine.policy.log") as mock_log:
         action = policy.evaluate(0.5)
         assert action.tier == "WARN"
         assert mock_log.warning.called

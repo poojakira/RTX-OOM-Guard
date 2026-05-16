@@ -7,10 +7,10 @@ import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.utils.data import DataLoader, Dataset, DistributedSampler
 
-# Apex-Aegis Imports
-from apex_aegis.trainer.auto_instrument import auto_instrument
-from apex_aegis.trainer.ddp import DDPSyncManager
-from apex_aegis.utils import get_logger
+# rtx-oom-guard Imports
+from rtx_oom_guard.trainer.auto_instrument import auto_instrument
+from rtx_oom_guard.trainer.ddp import DDPSyncManager
+from rtx_oom_guard.utils import get_logger
 
 # Optional MLflow
 try:
@@ -19,7 +19,7 @@ try:
 except ImportError:
     HAS_MLFLOW = False
 
-log = get_logger("apex_aegis.train_ddp")
+log = get_logger("rtx_oom_guard.train_ddp")
 
 # ---------------------------------------------------------------------------
 # Dummy Dataset & Model
@@ -61,7 +61,7 @@ def train(args):
     model = SimpleNet(args.input_size).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
-    # Apex-Aegis Core Instrumentation
+    # rtx-oom-guard Core Instrumentation
     # Automatically inserts fragmentation monitoring and proactive compaction hooks
     model, optimizer = auto_instrument(
         model, 
@@ -83,7 +83,7 @@ def train(args):
 
     # MLflow tracking
     if local_rank == 0 and HAS_MLFLOW:
-        mlflow.set_experiment("Apex-Aegis_DDP_Training")
+        mlflow.set_experiment("rtx-oom-guard_DDP_Training")
         mlflow.start_run(run_name=f"rank_0_{int(time.time())}")
         mlflow.log_params({
             "batch_size": args.batch_size,

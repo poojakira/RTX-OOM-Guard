@@ -1,15 +1,15 @@
 import time
 import torch
 import torch.nn as nn
-from apex_aegis.defrag_engine.defragmenter import GPUMemoryDefragmenter
-from apex_aegis.scheduler.risk_model import OOMRiskModel
-from apex_aegis.utils import get_logger
+from rtx_oom_guard.defrag_engine.defragmenter import GPUMemoryDefragmenter
+from rtx_oom_guard.scheduler.risk_model import OOMRiskModel
+from rtx_oom_guard.utils import get_logger
 
 # ---------------------------------------------------------------------------
 # Business Workload Simulation
 # ---------------------------------------------------------------------------
 
-log = get_logger("apex_aegis.business_pipeline")
+log = get_logger("rtx_oom_guard.business_pipeline")
 
 class BusinessInferenceModel(nn.Module):
     def __init__(self, d=1024):
@@ -26,7 +26,7 @@ class BusinessInferenceModel(nn.Module):
         return self.layers(x)
 
 def run_business_pipeline():
-    log.info("🚀 Initializing Enterprise Inference Pipeline (Apex-Aegis Protected)")
+    log.info("🚀 Initializing Enterprise Inference Pipeline (rtx-oom-guard Protected)")
     
     # Configuration
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

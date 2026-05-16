@@ -9,7 +9,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from apex_aegis.utils import get_logger
+from rtx_oom_guard.utils import get_logger
 
 log = get_logger("benchmark.compare")
 
@@ -30,7 +30,7 @@ def run_comparison(iterations: int = 100):
 
     log.info("")
     log.info("═" * 60)
-    log.info("PHASE 2: Running WITH apex_aegis")
+    log.info("PHASE 2: Running WITH rtx_oom_guard")
     log.info("═" * 60)
     defrag = run_benchmark_with_defrag(iterations)
 
@@ -42,7 +42,7 @@ def run_comparison(iterations: int = 100):
             "avg_time": baseline["avg_iteration_time"],
             "peak_memory_mb": baseline["peak_memory_mb"],
         },
-        "apex_aegis": {
+        "rtx_oom_guard": {
             "oom_errors": defrag["oom_errors"],
             "avg_time": defrag["avg_iteration_time"],
             "peak_memory_mb": defrag["peak_memory_mb"],
@@ -70,7 +70,7 @@ def run_comparison(iterations: int = 100):
     # CSV
     with open("results/comparison.csv", "w", newline="") as f:
         w = csv.writer(f)
-        w.writerow(["Metric", "Baseline", "apex_aegis", "Change (%)"])
+        w.writerow(["Metric", "Baseline", "rtx_oom_guard", "Change (%)"])
         w.writerow(["OOM Errors", baseline["oom_errors"], defrag["oom_errors"],
                      f"{comparison['improvement']['oom_reduction_pct']:.1f}%"])
         w.writerow(["Avg Iteration Time (s)", f"{baseline['avg_iteration_time']:.4f}",
@@ -84,7 +84,7 @@ def run_comparison(iterations: int = 100):
     log.info("═" * 60)
     log.info("RESULTS")
     log.info("═" * 60)
-    log.info("%-25s %-12s %-12s %-10s", "Metric", "Baseline", "apex_aegis", "Δ")
+    log.info("%-25s %-12s %-12s %-10s", "Metric", "Baseline", "rtx_oom_guard", "Δ")
     log.info("-" * 60)
     log.info("%-25s %-12d %-12d %-10s", "OOM Errors",
              baseline["oom_errors"], defrag["oom_errors"],

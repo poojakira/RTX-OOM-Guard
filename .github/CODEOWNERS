@@ -14,14 +14,14 @@
 # Primary Owner: @poojakira (ML Engineer)
 # -----------------------------------------------------------------------------
 # Core ML models, memory hooking, predictive diagnostics, and data pipelines.
-/src/apex_aegis/             @poojakira
-/src/apex_aegis/defrag/      @poojakira
-/src/apex_aegis/predictor/   @poojakira
-/src/apex_aegis/profiler/    @poojakira
-/src/apex_aegis/scheduler/   @poojakira
-/src/apex_aegis/trainer/     @poojakira
-/src/apex_aegis/llm_system/  @poojakira
-/src/apex_aegis/optimization/ @poojakira
+/src/rtx_oom_guard/             @poojakira
+/src/rtx_oom_guard/defrag/      @poojakira
+/src/rtx_oom_guard/predictor/   @poojakira
+/src/rtx_oom_guard/profiler/    @poojakira
+/src/rtx_oom_guard/scheduler/   @poojakira
+/src/rtx_oom_guard/trainer/     @poojakira
+/src/rtx_oom_guard/llm_system/  @poojakira
+/src/rtx_oom_guard/optimization/ @poojakira
 /scripts/                    @poojakira @rhutvik-pachghare
 /benchmarks/                 @poojakira
 /data/                       @poojakira

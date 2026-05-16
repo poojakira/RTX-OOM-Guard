@@ -5,7 +5,7 @@
     "avg_time": 1.94,
     "peak_memory_mb": 7840.4
   },
-  "apex_aegis": {
+  "rtx_oom_guard": {
     "oom_errors": 0,
     "avg_time": 1.76,
     "peak_memory_mb": 6920.4,

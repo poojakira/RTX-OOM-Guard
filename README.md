@@ -57,7 +57,7 @@ pip install -e .
 ### Zero-Code-Change Integration
 
 ```python
-from apex_aegis import auto_instrument
+from rtx_oom_guard import auto_instrument
 model, optimizer = auto_instrument(model, optimizer)
 # ... standard training loop, no other changes needed
 ```
@@ -65,7 +65,7 @@ model, optimizer = auto_instrument(model, optimizer)
 ### Manual Monitor
 
 ```python
-from apex_aegis import DefragMonitor
+from rtx_oom_guard import DefragMonitor
 monitor = DefragMonitor(threshold=0.7)
 monitor.start()
 for batch in dataloader:
@@ -114,7 +114,7 @@ logging:
 
 ```
 .
-├── src/apex_aegis/
+├── src/rtx_oom_guard/
 │   ├── defrag_engine/     # GPUMemoryDefragmenter, compactor, policy
 │   ├── defrag/            # Custom Triton copy kernel
 │   ├── scheduler/         # DefragMonitor, OOMRiskModel

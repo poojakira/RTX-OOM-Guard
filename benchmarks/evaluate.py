@@ -2,7 +2,7 @@
 benchmark/evaluate.py
 =====================
 
-Comprehensive evaluation suite for apex_aegis.
+Comprehensive evaluation suite for rtx_oom_guard.
 Runs the baseline vs defrag comparison, measures throughput, memory, 
 and generates visualizations of the results.
 """
@@ -15,7 +15,7 @@ from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from apex_aegis.utils import get_logger
+from rtx_oom_guard.utils import get_logger
 
 log = get_logger("evaluate")
 
@@ -43,7 +43,7 @@ def run_evaluation():
         data = json.load(f)
         
     baseline_time = data["baseline"]["avg_time"]
-    defrag_time = data["apex_aegis"]["avg_time"]
+    defrag_time = data["rtx_oom_guard"]["avg_time"]
     
     # Compute Throughput (iterations / sec)
     baseline_throughput = 1.0 / baseline_time if baseline_time > 0 else 0
@@ -51,7 +51,7 @@ def run_evaluation():
     
     # Add throughput to data and save
     data["baseline"]["throughput_iters_per_sec"] = baseline_throughput
-    data["apex_aegis"]["throughput_iters_per_sec"] = defrag_throughput
+    data["rtx_oom_guard"]["throughput_iters_per_sec"] = defrag_throughput
     data["improvement"]["throughput_change_pct"] = (
         ((defrag_throughput - baseline_throughput) / max(baseline_throughput, 1e-9)) * 100
     )
@@ -63,7 +63,7 @@ def run_evaluation():
     log.info("THROUGHPUT RESULTS")
     log.info("═" * 60)
     log.info(f"Baseline:  {baseline_throughput:.2f} iters/sec")
-    log.info(f"apex_aegis: {defrag_throughput:.2f} iters/sec")
+    log.info(f"rtx_oom_guard: {defrag_throughput:.2f} iters/sec")
     log.info(f"Delta:     {data['improvement']['throughput_change_pct']:.1f}%")
     log.info("═" * 60)
     
