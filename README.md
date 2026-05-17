@@ -18,7 +18,7 @@ model, optimizer = auto_instrument(model, optimizer)
 - **Does not migrate optimizer state.** Adam's `exp_avg` and `exp_avg_sq` remain in their original scattered allocations. After compaction, parameters are contiguous but optimizer state is still fragmented. A complete solution would walk `optimizer.state_dict()` and include state tensors.
 - **Does not migrate gradients.** `p.grad` tensors are not repacked.
 - **Does not use the Transformer predictor in practice.** The `FragPredictor` model has no training script, no labeled dataset, and no validated weights. The system actually uses `OOMRiskModel` — a rule-based sigmoid heuristic on `[utilization, fragmentation_ratio, allocation_rate]`.
-- **Has never been benchmarked on a real GPU.** All previously published numbers came from synthetic numpy curves, not `torch.cuda.memory_stats()`. Those docs have been deleted.
+- **Not yet validated on a real GPU.** Previous synthetic benchmarks were deleted. Run `notebooks/colab_t4_validation.ipynb` on a Colab T4 to produce real numbers. See `results/colab_t4_results.json` for latest run output (if present).
 
 ## How It Works
 
@@ -43,25 +43,19 @@ model, optimizer = auto_instrument(model, optimizer)
 
 **The empty tensor list.** The monitor's `_predict_and_act` originally called `defragment_tensors([])` — an empty list. The defragmenter returned `{"skipped": True}` every time. The monitor was running but never actually defragmenting. Fixed by adding `register_tensors()` so the monitor knows which tensors to compact.
 
-## To Actually Validate This
+## Validation
+
+Run the Colab notebook on a free T4:
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/poojakira/RTX-OOM-Guard/blob/main/notebooks/colab_t4_validation.ipynb)
 
 ```bash
-# On a Colab T4 (free):
-pip install -e .
-python -c "
-import torch
-from rtx_oom_guard import auto_instrument
-
-model = torch.nn.Transformer(d_model=512, nhead=8, num_encoder_layers=6).cuda()
-optimizer = torch.optim.Adam(model.parameters())
-model, optimizer = auto_instrument(model, optimizer)
-
-# Print memory stats before/after training
-print(torch.cuda.memory_stats()['allocated_bytes.all.peak'])
-"
+pip install git+https://github.com/poojakira/RTX-OOM-Guard.git
 ```
 
-Until someone runs this and publishes the output, the system is unvalidated.
+The notebook trains a 12-layer Transformer (d_model=1024, batch=16, seq=256) under deliberate memory fragmentation, with and without the guard. Workload is sized to push T4 to ~12-14GB — close enough to the 15.6GB ceiling that fragmentation can trigger OOM.
+
+Results are committed to `results/colab_t4_results.json` after each run. If the guard shows no improvement, that's documented too — the likely cause is that optimizer state (which isn't compacted) dominates the fragmentation pattern.
 
 ## Structure
 
