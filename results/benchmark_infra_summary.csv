@@ -1,4 +1,0 @@
-Metric,Baseline,Reactive,rtx-oom-guard,Peak Impact
-OOM Errors,180,163,0,180 errors eliminated
-Avg Fragmentation,0.45,0.40,0.15,-67.0%
-Throughput (it/s),0.83,0.92,24770.05,+2984243.37%
