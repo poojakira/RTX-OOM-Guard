@@ -1,174 +1,76 @@
-# RTX-OOM-Guard
+# gpu-memory-optimizer
 
-[![Python](https://img.shields.io/badge/Python-3.10+-blue)](https://python.org)
-[![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-ee4c2c)](https://pytorch.org)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
-[![CI](https://github.com/poojakira/RTX-OOM-Guard/actions/workflows/ci.yml/badge.svg)](https://github.com/poojakira/RTX-OOM-Guard/actions)
+Research prototype: proactive CUDA memory defragmentation for PyTorch training loops.
 
-**Proactive CUDA memory defragmenter for PyTorch that predicts and prevents GPU out-of-memory (OOM) crashes by actively compacting VRAM during training.**
+## What This Does
 
----
-
-## Problem
-
-PyTorch's `CachingAllocator` leaves VRAM fragmented during long training runs, causing OOM crashes even when total free memory appears sufficient. Gradient checkpointing and reduced batch sizes sacrifice throughput. RTX-OOM-Guard predicts fragmentation before it causes a crash and proactively compacts live tensors into contiguous blocks.
-
----
-
-## Key Features
-
-- **`GPUMemoryDefragmenter`** — Repacks scattered model parameters into a contiguous VRAM buffer via `.data` pointer replacement. **Note:** optimizer state tensors (Adam's `exp_avg`, `exp_avg_sq`) and gradients are NOT migrated — they remain in their original allocations. This compacts parameters only.
-- **Triton Copy Kernel** — Uses Triton `load`/`store` for the copy step when available; functionally equivalent to `tensor.copy_()` but exercises the Triton JIT path. Falls back to ATen otherwise.
-- **`OOMRiskModel`** — Rule-based heuristic scoring OOM probability from memory utilization, fragmentation ratio, and allocation rate. No ML — just sigmoid-squashed weighted features.
-- **`DefragMonitor`** — Background daemon polling at configurable intervals; triggers compaction when risk score exceeds threshold.
-- **`AllocationCollector`** — Hooks into PyTorch allocator to log per-step allocation/free events as Parquet traces.
-- **`auto_instrument`** — Wrapper that attaches the monitor to a training loop: `model, optimizer = auto_instrument(model, optimizer)`
-- **FastAPI REST API** — Exposes defrag status and telemetry endpoints
-- **React Dashboard** — Vite+React frontend for VRAM visualization
-
----
-
-## Status & Limitations
-
-This is a **research prototype**, not production infrastructure. Key limitations:
-
-- **Optimizer state is NOT compacted.** Only `model.parameters()` are repacked. Adam's `exp_avg`/`exp_avg_sq` remain in their original allocations. A complete solution would walk `optimizer.state_dict()` and include state tensors in the compaction buffer.
-- **Gradients are not migrated.** `p.grad` tensors are separate allocations not included in the contiguous buffer.
-- **DDP barrier from daemon thread is unsafe.** Calling `torch.distributed.barrier()` from a background thread can deadlock NCCL collectives. The DDP path should only be invoked from the main training loop.
-- **Benchmarks are simulated.** The numbers in `benchmarks/` come from synthetic fragmentation curves, not real GPU measurements. Real validation requires running on actual hardware with `torch.cuda.memory_stats()`.
-- **The FragPredictor has no training script.** The Transformer model exists but has no labeled dataset or training loop. The system falls back to the rule-based `OOMRiskModel` heuristic in practice.
-
-To run a real measurement, use a Colab T4 and compare `torch.cuda.memory_stats()['allocated_bytes.all.peak']` with and without the defragmenter on the same training loop.
-
----
-
-## Quick Start
-
-### Install
-
-```bash
-git clone https://github.com/poojakira/RTX-OOM-Guard.git
-cd RTX-OOM-Guard
-pip install -e .
-```
-
-### Zero-Code-Change Integration
+Repacks scattered model parameter tensors into a contiguous VRAM buffer by replacing `.data` pointers, then calls `empty_cache()` to release the fragmented blocks back to the caching allocator.
 
 ```python
 from rtx_oom_guard import auto_instrument
+
 model, optimizer = auto_instrument(model, optimizer)
-# ... standard training loop, no other changes needed
+# Training loop runs normally. Monitor triggers compaction when fragmentation exceeds threshold.
 ```
 
-### Manual Monitor
+## What This Does NOT Do
 
-```python
-from rtx_oom_guard import DefragMonitor
-monitor = DefragMonitor(threshold=0.7)
-monitor.start()
-for batch in dataloader:
-    monitor.record_alloc(tensor.numel() * tensor.element_size())
-    output = model(batch)
-    loss.backward()
-    optimizer.step()
-monitor.stop()
-print(monitor.stats())
-```
+- **Does not migrate optimizer state.** Adam's `exp_avg` and `exp_avg_sq` remain in their original scattered allocations. After compaction, parameters are contiguous but optimizer state is still fragmented. A complete solution would walk `optimizer.state_dict()` and include state tensors.
+- **Does not migrate gradients.** `p.grad` tensors are not repacked.
+- **Does not use the Transformer predictor in practice.** The `FragPredictor` model has no training script, no labeled dataset, and no validated weights. The system actually uses `OOMRiskModel` — a rule-based sigmoid heuristic on `[utilization, fragmentation_ratio, allocation_rate]`.
+- **Has never been benchmarked on a real GPU.** All previously published numbers came from synthetic numpy curves, not `torch.cuda.memory_stats()`. Those docs have been deleted.
 
-### Docker
+## How It Works
+
+1. `DefragMonitor` runs in a background daemon thread, polling memory state every 50ms
+2. `OOMRiskModel` scores OOM probability from current fragmentation ratio
+3. If score > threshold (default 0.7), triggers `GPUMemoryDefragmenter.defragment_tensors()`
+4. Defragmenter allocates a contiguous buffer, copies parameters into it via `tensor.copy_()` (or Triton if available), then rebinds `.data` pointers
+5. `gc.collect()` + `torch.cuda.empty_cache()` releases the old scattered blocks
+
+## Known Issues
+
+- **DDP barrier from daemon thread.** The defragmenter checks `threading.current_thread()` and skips `barrier()` if not on main thread (would deadlock NCCL). For DDP, use `pending_compaction=True` and trigger from the training loop.
+- **Kill switch is permanent.** If prediction latency exceeds 5ms, `self._killed = True` and the monitor exits. No recovery. This prevents the monitor from blocking training under GIL contention, but means any CPU spike permanently disables it.
+- **`chunk_buffer` lifetime.** After compaction, parameter `.data` tensors are views into `chunk_buffer` (a local variable). The storage stays alive via PyTorch's reference counting, but correctness depends on storage-aliasing semantics surviving `gc.collect()` + `empty_cache()`.
+- **Triton kernel is a copy loop.** `_compaction_copy_kernel` is a textbook `load → store` — functionally identical to `tensor.copy_()`. It exercises the Triton JIT path but provides no bandwidth advantage over ATen.
+
+## Development Notes
+
+**The thread leak.** `_persist_telemetry` originally spawned a new daemon thread on every write (every 200ms under active monitoring). Under sustained operation, this leaked hundreds of threads. Fixed with synchronous atomic writes (tempfile + `os.replace`).
+
+**The namespace collision.** This repo originally used `apex_aegis` as its package name — same as the Aerospace-Trajectory-Simulator repo. Renamed to `rtx_oom_guard` across 134 files.
+
+**The empty tensor list.** The monitor's `_predict_and_act` originally called `defragment_tensors([])` — an empty list. The defragmenter returned `{"skipped": True}` every time. The monitor was running but never actually defragmenting. Fixed by adding `register_tensors()` so the monitor knows which tensors to compact.
+
+## To Actually Validate This
 
 ```bash
-docker build -t rtx-oom-guard .
-docker run --gpus all rtx-oom-guard
+# On a Colab T4 (free):
+pip install -e .
+python -c "
+import torch
+from rtx_oom_guard import auto_instrument
+
+model = torch.nn.Transformer(d_model=512, nhead=8, num_encoder_layers=6).cuda()
+optimizer = torch.optim.Adam(model.parameters())
+model, optimizer = auto_instrument(model, optimizer)
+
+# Print memory stats before/after training
+print(torch.cuda.memory_stats()['allocated_bytes.all.peak'])
+"
 ```
 
-### React Dashboard
+Until someone runs this and publishes the output, the system is unvalidated.
 
-```bash
-cd dashboard
-npm install
-npm run dev  # http://localhost:5173
-```
+## Structure
 
----
-
-## Configuration
-
-Edit `configs/config.yaml`:
-
-```yaml
-defrag:
-  threshold: 0.7       # Fragmentation score to trigger compaction
-  interval_ms: 50      # Monitor polling interval
-  cooldown_steps: 10   # Steps between compaction runs
-  use_triton: true     # Use Triton kernels if available
-logging:
-  results_dir: results
-```
-
----
-
-## Project Structure
-
-```
-.
-├── src/rtx_oom_guard/
-│   ├── defrag_engine/     # GPUMemoryDefragmenter, compactor, policy
-│   ├── defrag/            # Custom Triton copy kernel
-│   ├── scheduler/         # DefragMonitor, OOMRiskModel
-│   ├── predictor/         # FragPredictor ML model
-│   ├── profiler/          # AllocationCollector, AllocatorLogger
-│   ├── trainer/           # auto_instrument, DefragCallback, DDPSyncManager
-│   ├── llm_system/        # KV cache manager
-│   └── api/main.py        # FastAPI REST API
-├── dashboard/            # React + Vite frontend (13 panels)
-├── benchmarks/           # OOM benchmarks, model fragmentation tests
-├── data/traces/          # 100+ Parquet memory trace files
-├── results/              # Benchmark results
-├── tests/                # 50+ test files
-├── configs/config.yaml
-├── Dockerfile
-└── run_benchmark.py
-```
-
----
-
-## Running Tests
-
-```bash
-pytest tests/ -v
-```
-
----
-
-## Design Decisions
-
-**Transformer predictor over simple heuristics** — `FragPredictor` in `src/rtx_oom_guard/predictor/` uses a Transformer architecture rather than a threshold on current fragmentation ratio. Fragmentation is path-dependent: the same 60% free memory can be perfectly contiguous or fatally scattered depending on the allocation/free sequence that produced it. A Transformer's self-attention over the recent allocation event stream captures these temporal patterns (e.g., repeated alloc-free-alloc cycles that create Swiss-cheese holes) which a single-point heuristic cannot.
-
-**Thread-safety in telemetry persistence** — The telemetry writer originally spawned a new `threading.Thread` per write to avoid blocking the monitor's 50 ms polling loop. Under high-frequency monitoring this leaked hundreds of threads per second, exhausting OS limits. The fix was switching to synchronous atomic writes (`os.replace` on a temp file) inside the monitor thread itself — the I/O is fast enough at the granularity of one JSON blob per interval, and eliminates the thread lifecycle overhead entirely.
-
-**Tiered policy: compact → evict → emergency** — A single fragmentation threshold would either trigger too early (wasting compaction cycles on benign fragmentation) or too late (OOM already inevitable). The tiered policy in `src/rtx_oom_guard/defrag_engine/` gives the system graduated responses: light compaction at 0.7, tensor eviction to CPU at 0.85, and emergency full-stop GC + compaction at 0.95. Each tier is cheaper than the next, so the common case (mild fragmentation) pays minimal overhead.
-
-**Tensor registration requirement** — The system requires explicit tensor registration via `monitor.register_tensors()` (or implicitly through `auto_instrument`). Passive CUDA memory monitoring can detect fragmentation but cannot defragment without knowing which live tensors to relocate — PyTorch's caching allocator doesn't expose a handle→tensor mapping. Registration builds that mapping so the compactor can safely `.data`-swap tensors into contiguous blocks without breaking autograd references.
-
----
-
-## Roadmap
-
-- [ ] Automatic Triton kernel tuning per GPU model
-- [ ] Integration with HuggingFace Trainer as a callback
-- [ ] Support for FSDP (Fully Sharded Data Parallel)
-- [ ] Live memory visualization via WebSocket
-- [ ] PyPI package release
-
----
-
-## License
-
-MIT — see [LICENSE](LICENSE).
-
----
+- `src/rtx_oom_guard/defrag_engine/` — Core compaction logic
+- `src/rtx_oom_guard/scheduler/` — Monitor, risk model, dataset
+- `src/rtx_oom_guard/predictor/` — Transformer model (unused in practice)
+- `src/rtx_oom_guard/profiler/` — Allocation event collector
+- `src/rtx_oom_guard/trainer/` — Auto-instrumentation hooks
 
 ## Author
 
-Built by [Pooja Kiran](https://github.com/poojakira) — M.S. student at Arizona State University.
+Pooja Kiran — [@poojakira](https://github.com/poojakira)
