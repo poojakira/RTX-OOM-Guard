@@ -21,9 +21,7 @@ except ImportError:
 
 log = get_logger("rtx_oom_guard.train_ddp")
 
-# ---------------------------------------------------------------------------
 # Dummy Dataset & Model
-# ---------------------------------------------------------------------------
 
 class RandomDataset(Dataset):
     def __init__(self, size, length):
@@ -46,9 +44,7 @@ class SimpleNet(nn.Module):
     def forward(self, x):
         return self.fc2(self.relu(self.fc(x)))
 
-# ---------------------------------------------------------------------------
 # Training Loop
-# ---------------------------------------------------------------------------
 
 def train(args):
     # DDP Setup

@@ -37,9 +37,7 @@ from pathlib import Path
 from unittest.mock import patch, MagicMock, PropertyMock
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
 # cli.py — Lines 32-34 (ImportError branch for rich), 85-86, 292, 350
-# ═══════════════════════════════════════════════════════════════════════════════
 
 class TestCLICoverage:
     """Covers ImportError fallback for rich (L32-34), collect error (L85-86),
@@ -99,9 +97,7 @@ class TestCLICoverage:
                 pass
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
 # dashboard.py — Lines 48-49, 55-58, 65-66, 121
-# ═══════════════════════════════════════════════════════════════════════════════
 
 class TestDashboardCoverage:
     """Covers sync copy failures (48-49), command sync (55-58),
@@ -181,9 +177,7 @@ class TestDashboardCoverage:
             dashboard.main()
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
 # benchmark_triton.py — Lines 26-27, 34-35, 77, 86
-# ═══════════════════════════════════════════════════════════════════════════════
 
 class TestBenchmarkTritonCoverage:
     """Covers Triton import fallback (26-27), run_benchmark early return (34-35),
@@ -228,9 +222,7 @@ class TestBenchmarkTritonCoverage:
             benchmark_triton.run_benchmark()
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
 # defragmenter.py — Lines 25-28, 59-60, 93, 110, 119, 218, 261-262, 266-267
-# ═══════════════════════════════════════════════════════════════════════════════
 
 class TestDefragmenterCoverage:
     """Covers Triton import success (25-28), CUDA warmup (59-60),
@@ -294,9 +286,7 @@ class TestDefragmenterCoverage:
             mock_barrier.assert_called_once()
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
 # kernels.py — Lines 12-13, 77, 130, 134
-# ═══════════════════════════════════════════════════════════════════════════════
 
 class TestKernelsCoverage:
     """Covers Triton import success path (12-13), empty tensor (77),
@@ -349,9 +339,7 @@ class TestKernelsCoverage:
                 pass  # Expected — kernel can't run on CPU
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
 # policy.py — Lines 42, 152-153, 181-182
-# ═══════════════════════════════════════════════════════════════════════════════
 
 class TestPolicyCoverage:
     """Covers MitigationAction.to_dict (42), policy heartbeat exception (152-153),
@@ -386,9 +374,7 @@ class TestPolicyCoverage:
             assert result is False
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
 # quantization.py — Lines 30-31, 40
-# ═══════════════════════════════════════════════════════════════════════════════
 
 class TestQuantizationCoverage:
     """Covers CUDA available path (30-31) and get_model_size_mb buffers (40)."""
@@ -409,9 +395,7 @@ class TestQuantizationCoverage:
         assert size > 0
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
 # allocator_logger.py — Lines 43-44
-# ═══════════════════════════════════════════════════════════════════════════════
 
 class TestAllocatorLoggerCoverage:
     """Covers _mem_stats CUDA branch (43-44)."""
@@ -427,9 +411,7 @@ class TestAllocatorLoggerCoverage:
             assert stats["reserved"] == pytest.approx(200.0, abs=0.01)
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
 # collector.py — Lines 52, 160-161, 163-164, 197
-# ═══════════════════════════════════════════════════════════════════════════════
 
 class TestCollectorCoverage:
     """Covers record() no-CUDA (52), build_resnet50 (160-161),
@@ -497,9 +479,7 @@ class TestCollectorCoverage:
             assert isinstance(count, int)
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
 # dataset.py — Line 106
-# ═══════════════════════════════════════════════════════════════════════════════
 
 class TestDatasetCoverage:
     """Covers empty dataset RuntimeError (106)."""
@@ -515,9 +495,7 @@ class TestDatasetCoverage:
             create_dataloaders(config)
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
 # monitor.py — Lines 110-113, 176, 188-191, 199, 224
-# ═══════════════════════════════════════════════════════════════════════════════
 
 class TestMonitorCoverage:
     """Covers model loading error branches (110-113), auto_record delta != 0 (176),
@@ -594,9 +572,7 @@ class TestMonitorCoverage:
             assert monitor.pending_compaction is True
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
 # _models.py — Line 56
-# ═══════════════════════════════════════════════════════════════════════════════
 
 class TestModelsCoverage:
     """Covers ResNet50 torchvision ImportError fallback (56)."""
@@ -612,9 +588,7 @@ class TestModelsCoverage:
             assert inputs.shape == (16, 3, 224, 224)
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
 # auto_instrument.py — Lines 58-61, 153-155
-# ═══════════════════════════════════════════════════════════════════════════════
 
 class TestAutoInstrumentCoverage:
     """Covers backward hook on tuple output (58-61),
@@ -660,9 +634,7 @@ class TestAutoInstrumentCoverage:
             assert wrapped_model is not None
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
 # ddp.py — Lines 62, 82
-# ═══════════════════════════════════════════════════════════════════════════════
 
 class TestDDPCoverage:
     """Covers sync_events overflow (62) and get_avg_overhead empty (82)."""
@@ -688,9 +660,7 @@ class TestDDPCoverage:
         assert avg == pytest.approx(2.0)
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
 # trainer.py — Lines 80, 89
-# ═══════════════════════════════════════════════════════════════════════════════
 
 class TestTrainerCoverage:
     """Covers verbose logging (80) and best model save logging (89)."""
@@ -724,9 +694,7 @@ class TestTrainerCoverage:
         assert len(metrics["train_loss"]) == 2
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
 # training_hook.py — Lines 196-198
-# ═══════════════════════════════════════════════════════════════════════════════
 
 class TestTrainingHookCoverage:
     """Covers _total_gpu_mb ImportError fallback (196-198)."""
@@ -754,9 +722,7 @@ class TestTrainingHookCoverage:
                 pass
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
 # utils.py — Lines 143-144, 163, 167-168, 188
-# ═══════════════════════════════════════════════════════════════════════════════
 
 class TestUtilsCoverage:
     """Covers get_cuda_info exception (143-144), parse_memory_snapshot

@@ -53,7 +53,6 @@ def _print(msg: str, style: Optional[str] = None) -> None:
         print(msg)
 
 
-# ─── Entry Points ─────────────────────────────────────────────────────────────
 # These are registered in pyproject.toml as console_scripts.
 # Each must parse its own args when called standalone.
 
@@ -203,7 +202,6 @@ def dashboard_cmd() -> None:
         _print("✔ System offline. Have a productive day!", "bold green")
 
 
-# ─── Main CLI ─────────────────────────────────────────────────────────────────
 
 
 def main() -> None:

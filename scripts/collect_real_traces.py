@@ -36,9 +36,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-# ---------------------------------------------------------------------------
 # GPU / CPU detection
-# ---------------------------------------------------------------------------
 
 HAS_CUDA = torch.cuda.is_available()
 DEVICE = torch.device("cuda" if HAS_CUDA else "cpu")
@@ -83,9 +81,7 @@ def _get_memory_stats() -> Dict[str, float]:
         }
 
 
-# ---------------------------------------------------------------------------
 # Real model definitions
-# ---------------------------------------------------------------------------
 
 class RealGPT2(nn.Module):
     """Actual GPT-2-style transformer for real training."""
@@ -178,9 +174,7 @@ class RealBERT(nn.Module):
         return self.mlm_head(h)
 
 
-# ---------------------------------------------------------------------------
 # Model registry
-# ---------------------------------------------------------------------------
 
 MODEL_CONFIGS = {
     "gpt2": {
@@ -228,9 +222,7 @@ MODEL_CONFIGS = {
 }
 
 
-# ---------------------------------------------------------------------------
 # Trace collection
-# ---------------------------------------------------------------------------
 
 @dataclass
 class RealTraceEvent:
@@ -385,9 +377,7 @@ def collect_trace(
     return [asdict(e) for e in events]
 
 
-# ---------------------------------------------------------------------------
 # Main
-# ---------------------------------------------------------------------------
 
 def main():
     ap = argparse.ArgumentParser(description="Collect REAL GPU memory traces")

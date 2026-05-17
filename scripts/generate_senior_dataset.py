@@ -32,15 +32,12 @@ from scripts.workload_simulator import (
     CNNSpec,
 )
 
-# ---------------------------------------------------------------------------
 # Configurations matrix
-# ---------------------------------------------------------------------------
 
 def _build_configs() -> list[dict]:
     """Build a matrix of workload configurations for diversity."""
     configs = []
 
-    # --- Transformers ---
     for arch_fn, name in [
         (TransformerSpec.gpt2, "gpt2"),
         (TransformerSpec.gpt2_medium, "gpt2m"),
@@ -64,7 +61,6 @@ def _build_configs() -> list[dict]:
                         "steps": 200,
                     })
 
-    # --- CNNs ---
     for arch_fn, name in [
         (CNNSpec.resnet50, "resnet50"),
         (CNNSpec.resnet101, "resnet101"),
@@ -98,9 +94,7 @@ def _risk_label(events: list[dict]) -> str:
         return "stable"
 
 
-# ---------------------------------------------------------------------------
 # Main
-# ---------------------------------------------------------------------------
 
 def main():
     ap = argparse.ArgumentParser(description="Generate senior GPU memory trace dataset")

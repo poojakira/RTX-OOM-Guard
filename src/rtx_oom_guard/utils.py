@@ -9,7 +9,6 @@ from dataclasses import dataclass, asdict
 from pathlib import Path
 import yaml
 
-# ─── Logging ───────────────────────────────────────────────────────────────────
 
 def get_logger(name: str, level: int = logging.INFO) -> logging.Logger:
     """Create a consistently formatted logger."""
@@ -27,7 +26,6 @@ def get_logger(name: str, level: int = logging.INFO) -> logging.Logger:
     return logger
 
 
-# ─── Configuration ─────────────────────────────────────────────────────────────
 
 @dataclass
 class DefragConfig:
@@ -99,7 +97,6 @@ class DefragConfig:
             return cls()
 
 
-# ─── Timer ─────────────────────────────────────────────────────────────────────
 
 class Timer:
     """High-resolution timer for benchmarking."""
@@ -124,7 +121,6 @@ class Timer:
         return self._elapsed
 
 
-# ─── GPU Helpers ───────────────────────────────────────────────────────────────
 
 def get_cuda_info() -> dict:
     """Return comprehensive CUDA info or None if unavailable."""

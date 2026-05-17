@@ -14,9 +14,7 @@ from prometheus_client import Counter, Gauge, Histogram, generate_latest, CONTEN
 from rtx_oom_guard.scheduler.risk_model import OOMRiskModel
 from rtx_oom_guard.profiler.allocator_logger import AllocatorLogger
 
-# ---------------------------------------------------------------------------
 # Structured Logging Configuration
-# ---------------------------------------------------------------------------
 structlog.configure(
     processors=[
         structlog.contextvars.merge_contextvars,
@@ -31,9 +29,7 @@ structlog.configure(
 )
 logger = structlog.get_logger("rtx_oom_guard.api")
 
-# ---------------------------------------------------------------------------
 # Prometheus Metrics
-# ---------------------------------------------------------------------------
 METRIC_OOM_RISK = Gauge(
     "rtx_oom_guard_oom_risk_score", 
     "Current OOM risk score predicted by rtx-oom-guard",
@@ -62,9 +58,7 @@ METRIC_REQUEST_LATENCY = Histogram(
     ["method", "endpoint", "status"]
 )
 
-# ---------------------------------------------------------------------------
 # APP Initialization
-# ---------------------------------------------------------------------------
 app = FastAPI(
     title="rtx-oom-guard API",
     description="Production-grade GPU memory telemetry and OOM forecasting surface",
@@ -100,15 +94,11 @@ async def track_metrics_and_logs(request: Request, call_next):
     )
     return response
 
-# ---------------------------------------------------------------------------
 # Shared State
-# ---------------------------------------------------------------------------
 _risk_model = OOMRiskModel(mode="rule")
 _logger = AllocatorLogger()
 
-# ---------------------------------------------------------------------------
 # Schemas
-# ---------------------------------------------------------------------------
 class RiskRequest(BaseModel):
     fragmentation: float = Field(0.0, ge=0.0, le=1.0)
     utilisation: float = Field(0.0, ge=0.0, le=1.0)
@@ -126,9 +116,7 @@ class MemoryResponse(BaseModel):
     current_frag: float
     cuda_available: bool
 
-# ---------------------------------------------------------------------------
 # Internal Helpers
-# ---------------------------------------------------------------------------
 def _gpu_snapshot() -> Dict[str, Any]:
     try:
         import torch
@@ -154,9 +142,7 @@ def _gpu_snapshot() -> Dict[str, Any]:
         "cuda_available": False,
     }
 
-# ---------------------------------------------------------------------------
 # API Routes
-# ---------------------------------------------------------------------------
 api_router = APIRouter(prefix="/api")
 
 @api_router.get("/health")
@@ -220,9 +206,7 @@ def get_full_telemetry():
 
 app.include_router(api_router)
 
-# ---------------------------------------------------------------------------
 # Static Dashboard Mount
-# ---------------------------------------------------------------------------
 DASHBOARD_PATH = Path(__file__).parent.parent.parent.parent / "dashboard" / "dist"
 
 if DASHBOARD_PATH.exists():

@@ -37,9 +37,7 @@ from scripts.workload_simulator import (
 )
 
 
-# ---------------------------------------------------------------------------
 # Streamed workload runner — writes Parquet in chunks
-# ---------------------------------------------------------------------------
 
 CHUNK_SIZE = 50_000  # Flush to disk every 50K events
 
@@ -208,9 +206,7 @@ def _run_streamed(
     }
 
 
-# ---------------------------------------------------------------------------
 # Config matrix
-# ---------------------------------------------------------------------------
 
 def _build_large_configs(steps: int):
     configs = []
@@ -268,9 +264,7 @@ def _risk_label(meta: dict) -> str:
         return "stable"
 
 
-# ---------------------------------------------------------------------------
 # Main
-# ---------------------------------------------------------------------------
 
 def main():
     ap = argparse.ArgumentParser(

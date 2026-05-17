@@ -5,9 +5,7 @@ from rtx_oom_guard.defrag_engine.defragmenter import GPUMemoryDefragmenter
 from rtx_oom_guard.scheduler.risk_model import OOMRiskModel
 from rtx_oom_guard.utils import get_logger
 
-# ---------------------------------------------------------------------------
 # Business Workload Simulation
-# ---------------------------------------------------------------------------
 
 log = get_logger("rtx_oom_guard.business_pipeline")
 

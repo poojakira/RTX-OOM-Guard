@@ -13,7 +13,6 @@ app = FastAPI(
     version="2.0.0",
 )
 
-# ─── CORS ─────────────────────────────────────────────────────────────
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -22,9 +21,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ---------------------------------------------------------------------------
 # Shared state
-# ---------------------------------------------------------------------------
 
 from rtx_oom_guard.scheduler.risk_model import OOMRiskModel
 from rtx_oom_guard.profiler.allocator_logger import AllocatorLogger
@@ -32,9 +29,7 @@ from rtx_oom_guard.profiler.allocator_logger import AllocatorLogger
 _risk_model = OOMRiskModel(mode="rule")
 _logger = AllocatorLogger()
 
-# ---------------------------------------------------------------------------
 # Schemas
-# ---------------------------------------------------------------------------
 
 class RiskRequest(BaseModel):
     fragmentation: float = Field(0.0, ge=0.0, le=1.0, description="Fragmentation ratio")
@@ -53,9 +48,7 @@ class MemoryResponse(BaseModel):
     current_frag: float
     cuda_available: bool
 
-# ---------------------------------------------------------------------------
 # GPU helpers
-# ---------------------------------------------------------------------------
 
 def _gpu_snapshot() -> Dict[str, Any]:
     try:
@@ -80,9 +73,7 @@ def _gpu_snapshot() -> Dict[str, Any]:
         "cuda_available": False,
     }
 
-# ---------------------------------------------------------------------------
 # API Router
-# ---------------------------------------------------------------------------
 api_router = APIRouter(prefix="/api")
 
 @api_router.get("/health")
@@ -172,9 +163,7 @@ def get_benchmark_results():
 
 app.include_router(api_router)
 
-# ---------------------------------------------------------------------------
 # Static Dashboard Mount (SPA Fallback)
-# ---------------------------------------------------------------------------
 # Resolves paths for standalone PyPI execution
 DASHBOARD_PATH = Path(__file__).parent.parent / "dashboard" / "dist"
 

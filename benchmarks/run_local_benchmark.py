@@ -35,9 +35,7 @@ from rtx_oom_guard.scheduler.risk_model import OOMRiskModel
 from rtx_oom_guard.trainer.training_hook import TrainingHook
 from rtx_oom_guard.defrag_engine.policy import MitigationPolicy
 
-# ---------------------------------------------------------------------------
 # Detect GPU
-# ---------------------------------------------------------------------------
 
 try:
     import torch
@@ -51,9 +49,7 @@ GPU_NAME = "NVIDIA GeForce RTX 4060" if not HAS_CUDA else (
 )
 
 
-# ---------------------------------------------------------------------------
 # Tiny GPT-2 for the benchmark (reused pattern from rtx_oom_guard._models)
-# ---------------------------------------------------------------------------
 
 if HAS_CUDA:
     class _BenchModel(nn.Module):
@@ -74,9 +70,7 @@ if HAS_CUDA:
             return self.head(self.enc(h))
 
 
-# ---------------------------------------------------------------------------
 # Fragmentation helper
-# ---------------------------------------------------------------------------
 
 def _fragment_gpu(n_chunks: int = 40, chunk_mb: int = 8):
     """Punch holes in the CUDA allocator pool."""
@@ -94,9 +88,7 @@ def _fragment_gpu(n_chunks: int = 40, chunk_mb: int = 8):
     return survivors
 
 
-# ---------------------------------------------------------------------------
 # Single run (GPU)
-# ---------------------------------------------------------------------------
 
 def _run_gpu(run_id: int, steps: int, batch_size: int, seq_len: int):
     """Execute one benchmark run on a real GPU."""
@@ -165,9 +157,7 @@ def _run_gpu(run_id: int, steps: int, batch_size: int, seq_len: int):
     }
 
 
-# ---------------------------------------------------------------------------
 # Single run (CPU — simulated metrics consistent with README)
-# ---------------------------------------------------------------------------
 
 def _run_cpu_simulated(run_id: int, steps: int, batch_size: int, seq_len: int):
     """Generate realistic simulated metrics on CPU."""
@@ -235,9 +225,7 @@ def _run_cpu_simulated(run_id: int, steps: int, batch_size: int, seq_len: int):
     }
 
 
-# ---------------------------------------------------------------------------
 # Main
-# ---------------------------------------------------------------------------
 
 def main():
     ap = argparse.ArgumentParser(description="Local RTX benchmark for rtx_oom_guard")

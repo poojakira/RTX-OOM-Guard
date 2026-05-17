@@ -24,9 +24,7 @@ from typing import List, Optional, Dict, Any
 
 log = logging.getLogger("rtx_oom_guard.allocator_logger")
 
-# ---------------------------------------------------------------------------
 # GPU helpers (lazy-import torch so module is importable without CUDA)
-# ---------------------------------------------------------------------------
 
 def _cuda_available() -> bool:
     try:
@@ -47,9 +45,7 @@ def _mem_stats() -> Dict[str, float]:
     }
 
 
-# ---------------------------------------------------------------------------
 # Data structures
-# ---------------------------------------------------------------------------
 
 @dataclass
 class StepRecord:
@@ -68,9 +64,7 @@ class StepRecord:
         return asdict(self)
 
 
-# ---------------------------------------------------------------------------
 # Logger
-# ---------------------------------------------------------------------------
 
 class AllocatorLogger:
     """

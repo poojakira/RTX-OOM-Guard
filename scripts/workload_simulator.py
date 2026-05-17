@@ -38,9 +38,7 @@ if not log.handlers:
     log.setLevel(logging.INFO)
 
 
-# ---------------------------------------------------------------------------
 # Architecture specifications
-# ---------------------------------------------------------------------------
 
 @dataclass
 class TransformerSpec:
@@ -162,9 +160,7 @@ class CNNSpec:
                    input_hw=380, batch_size=batch_size)
 
 
-# ---------------------------------------------------------------------------
 # Block-level allocator model
-# ---------------------------------------------------------------------------
 
 BLOCK_SIZE_MB = 2  # PyTorch caching allocator quantizes to 2 MB blocks
 
@@ -328,9 +324,7 @@ class CachingAllocator:
         return True
 
 
-# ---------------------------------------------------------------------------
 # Workload runner
-# ---------------------------------------------------------------------------
 
 @dataclass
 class TraceEvent:
@@ -532,9 +526,7 @@ class GPUWorkload:
         return [asdict(e) for e in self.events]
 
 
-# ---------------------------------------------------------------------------
 # CLI verification
-# ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
     import argparse
