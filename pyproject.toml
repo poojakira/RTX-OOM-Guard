@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=68.0", "wheel"]
+requires = ["setuptools>=68.0,<72", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -14,7 +14,7 @@ authors = [
 ]
 keywords = ["gpu", "cuda", "memory", "defragmentation", "pytorch", "transformer", "observability"]
 classifiers = [
-    "Development Status :: 5 - Production/Stable",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "License :: OSI Approved :: MIT License",

@@ -33,6 +33,10 @@ def main():
     with open(config_path, "r") as f:
         yaml_data = yaml.safe_load(f)
 
+    if not yaml_data or not isinstance(yaml_data, dict):
+        log.error("Configuration file is empty or invalid.")
+        sys.exit(1)
+
     # Initialize the centralized configuration
     cfg = DefragConfig()
     for k, v in yaml_data.items():

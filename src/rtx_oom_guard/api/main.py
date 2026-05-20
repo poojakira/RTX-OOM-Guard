@@ -68,7 +68,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -195,7 +195,6 @@ def get_full_telemetry():
                 telemetry.update({k: live_data.get(k, telemetry.get(k)) for k in telemetry.keys()})
                 
                 # Sync metrics from live telemetry
-                METRIC_COMPACTIONS._value.set(live_data.get("total_compactions", 0))
                 if "current_allocated_mb" in live_data:
                     METRIC_VRAM_ALLOCATED.set(live_data["current_allocated_mb"] * 1024 * 1024)
                     METRIC_VRAM_RESERVED.set(live_data.get("current_reserved_mb", 0) * 1024 * 1024)

@@ -25,7 +25,7 @@ run:
 	python run.py --config configs/config.yaml
 
 run-benchmarks:
-	python run_benchmark.py --config configs/config.yaml
+	python -m benchmarks.run_local_benchmark
 
 dashboard:
 	cd dashboard && npm run dev

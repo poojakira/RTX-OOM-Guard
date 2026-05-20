@@ -82,19 +82,19 @@ class PagedKVCacheAdapter:
         if engine_callback:
             engine_callback()
             
-        # Refreshed state logic
-        self.free_physical_blocks = list(range(len(self.free_physical_blocks)))
-        self.logical_to_physical.clear() # Cache invalidated for example
+        # Sort free blocks to maximize contiguity for future allocations
+        self.free_physical_blocks.sort()
 
     def sync_with_defragmenter(self, defragmenter: Any):
         """
         Hook to allow the KV Cache adapter to report its state directly to the 
         global defragmenter telemetry pipe.
         """
+        import time as _time
         meta = self.get_metadata()
         if hasattr(defragmenter, "_history"):
             defragmenter._history.append({
-                "timestamp": torch.cuda.Event(enable_timing=True).record() if torch.cuda.is_available() else 0,
+                "timestamp": _time.time(),
                 "reason": "kv_cache_sync",
                 "kv_fragmentation": meta["fragmentation_score"],
                 "kv_allocated_blocks": meta["allocated_blocks"]

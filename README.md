@@ -57,6 +57,34 @@ The notebook trains a 12-layer Transformer (d_model=1024, batch=16, seq=256) und
 
 Results are committed to `results/colab_t4_results.json` after each run. If the guard shows no improvement, that's documented too — the likely cause is that optimizer state (which isn't compacted) dominates the fragmentation pattern.
 
+## Quick Start (Local)
+
+```bash
+# Install in editable mode
+pip install -e "."
+
+# Or install with all optional dependencies
+pip install -e ".[all]"
+
+# Run the verification script (works on CPU)
+python verify.py
+
+# Start the monitor with config
+python run.py --config configs/config.yaml
+
+# Run tests
+pytest tests/
+
+# Run benchmarks
+python -m benchmarks.run_local_benchmark
+
+# Start the REST API server
+rtx-oom-guard server --port 8000
+
+# Launch the dashboard (requires npm install in dashboard/)
+rtx-oom-guard dashboard
+```
+
 ## Structure
 
 - `src/rtx_oom_guard/defrag_engine/` — Core compaction logic
