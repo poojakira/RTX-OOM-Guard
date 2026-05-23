@@ -1,6 +1,6 @@
 # AeroGrid v2.0.0 — Monitoring HUD
 
-This is the production-grade React/Vite dashboard for the **Predictive GPU Memory Defragmenter**. It provides real-time visibility into VRAM topology, fragmentation forecasts, and Triton kernel execution traces.
+This is a React/Vite dashboard for the **Predictive GPU Memory Defragmenter** research prototype. It visualizes exported telemetry when available and falls back to bundled demo data for local UI development.
 
 ## 🚀 Getting Started
 
@@ -29,4 +29,4 @@ This is the production-grade React/Vite dashboard for the **Predictive GPU Memor
 | **Triton Inspector** | 06, 09 | Kernel-level latency profiling and compaction execution trace. |
 
 ## 🛠️ Telemetry Sync
-The dashboard communicates with the `rtx_oom_guard` REST API (default: `localhost:8000`) to fetch historical benchmarks and real-time GPU statistics. Field names are standardized to `camelCase` (e.g., `elapsedMs`, `fragReduction`) for seamless React state integration.
+The dashboard communicates with the `rtx_oom_guard` REST API (default: `localhost:8000`) to fetch historical benchmark traces and GPU telemetry. When the backend is absent, UI panels may show bundled demo JSON; do not cite those values as benchmark or production evidence.
