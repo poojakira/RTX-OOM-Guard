@@ -288,10 +288,10 @@ def main():
     grand_total_events = 0
     t0 = time.time()
 
-    print(f"Generating {len(indices)} large traces ({args.steps:,} steps each) → {out_dir}")
-    print(f"Config space: {len(configs)} total configurations")
-    print(f"Estimated events: ~{len(indices) * args.steps * 15:,}")
-    print()
+    import logging; logging.info(f"Generating {len(indices)} large traces ({args.steps:,} steps each) → {out_dir}")
+    import logging; logging.info(f"Config space: {len(configs)} total configurations")
+    import logging; logging.info(f"Estimated events: ~{len(indices) * args.steps * 15:,}")
+    import logging; logging.info()
 
     for i, idx in enumerate(indices):
         cfg = configs[idx]
@@ -312,7 +312,7 @@ def main():
                 output_path=trace_path,
             )
         except Exception as e:
-            print(f"  [{i+1:3d}] SKIP {name}: {e}")
+            import logging; logging.info(f"  [{i+1:3d}] SKIP {name}: {e}")
             continue
 
         elapsed_trace = time.time() - t_trace
@@ -355,16 +355,16 @@ def main():
     labels = [m["risk_label"] for m in manifest]
     total_size_mb = sum(f.stat().st_size for f in out_dir.glob("*.parquet")) / (1024**2)
 
-    print(f"\n{'='*70}")
-    print(f"Dataset generation complete in {elapsed/60:.1f} minutes")
-    print(f"  Traces:       {len(manifest)}")
-    print(f"  Total events: {grand_total_events:,}")
-    print(f"  Total size:   {total_size_mb:,.1f} MB ({total_size_mb/1024:.2f} GB)")
-    print(f"  stable:       {labels.count('stable')}")
-    print(f"  high_risk:    {labels.count('high_risk')}")
-    print(f"  critical:     {labels.count('critical')}")
-    print(f"  Manifest:     {manifest_path}")
-    print(f"  Throughput:   {grand_total_events/elapsed:,.0f} events/sec")
+    import logging; logging.info(f"\n{'='*70}")
+    import logging; logging.info(f"Dataset generation complete in {elapsed/60:.1f} minutes")
+    import logging; logging.info(f"  Traces:       {len(manifest)}")
+    import logging; logging.info(f"  Total events: {grand_total_events:,}")
+    import logging; logging.info(f"  Total size:   {total_size_mb:,.1f} MB ({total_size_mb/1024:.2f} GB)")
+    import logging; logging.info(f"  stable:       {labels.count('stable')}")
+    import logging; logging.info(f"  high_risk:    {labels.count('high_risk')}")
+    import logging; logging.info(f"  critical:     {labels.count('critical')}")
+    import logging; logging.info(f"  Manifest:     {manifest_path}")
+    import logging; logging.info(f"  Throughput:   {grand_total_events/elapsed:,.0f} events/sec")
 
 
 if __name__ == "__main__":

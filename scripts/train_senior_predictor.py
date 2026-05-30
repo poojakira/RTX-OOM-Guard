@@ -169,13 +169,13 @@ def train(
     with open(metrics_path, "w") as f:
         json.dump(metrics, f, indent=2)
 
-    print(f"\n{'='*60}")
-    print(f"Training complete in {elapsed:.1f}s")
-    print(f"  Best val loss: {best_val_loss:.6f}")
-    print(f"  Test loss:     {test_loss:.6f}")
-    print(f"  Test MAE:      {test_mae:.6f}")
-    print(f"  Checkpoint:    {ckpt_path}")
-    print(f"  Metrics:       {metrics_path}")
+    import logging; logging.info(f"\n{'='*60}")
+    import logging; logging.info(f"Training complete in {elapsed:.1f}s")
+    import logging; logging.info(f"  Best val loss: {best_val_loss:.6f}")
+    import logging; logging.info(f"  Test loss:     {test_loss:.6f}")
+    import logging; logging.info(f"  Test MAE:      {test_mae:.6f}")
+    import logging; logging.info(f"  Checkpoint:    {ckpt_path}")
+    import logging; logging.info(f"  Metrics:       {metrics_path}")
 
 
 if __name__ == "__main__":

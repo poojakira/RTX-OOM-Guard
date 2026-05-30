@@ -181,15 +181,15 @@ def main():
     mode_label = "GPU" if HAS_CUDA else "NO GPU"
 
     if run_fn is None:
-        print("ERROR: No CUDA GPU available. This benchmark requires a real GPU.")
-        print("Run notebooks/colab_t4_validation.ipynb on a free Colab T4 instead.")
+        import logging; logging.info("ERROR: No CUDA GPU available. This benchmark requires a real GPU.")
+        import logging; logging.info("Run notebooks/colab_t4_validation.ipynb on a free Colab T4 instead.")
         sys.exit(1)
 
-    print(f"Running {args.runs} benchmark runs ({mode_label}) …")
+    import logging; logging.info(f"Running {args.runs} benchmark runs ({mode_label}) …")
 
     all_results = []
     for i in range(1, args.runs + 1):
-        print(f"  Run {i}/{args.runs} …", end=" ", flush=True)
+        import logging; logging.info(f"  Run {i}/{args.runs} …", end=" ", flush=True)
         result = run_fn(i, args.steps, args.batch_size, args.seq_len)
         all_results.append(result)
 
@@ -217,7 +217,7 @@ def main():
                 "avg_fragmentation": r["avg_fragmentation"],
                 "avg_step_time_s": r["avg_step_time_s"],
             })
-    print(f"\n  Summary CSV → {csv_path}")
+    import logging; logging.info(f"\n  Summary CSV → {csv_path}")
 
     # -- Fragmentation-vs-time plot ----------------------------------------
     try:
@@ -242,11 +242,11 @@ def main():
         plot_path = plots_dir / "fragmentation_vs_time.png"
         fig.savefig(plot_path, dpi=150)
         plt.close(fig)
-        print(f"  Plot → {plot_path}")
+        import logging; logging.info(f"  Plot → {plot_path}")
     except ImportError:
-        print("  (matplotlib not available — skipping plot)")
+        import logging; logging.info("  (matplotlib not available — skipping plot)")
 
-    print("\nBenchmark complete.")
+    import logging; logging.info("\nBenchmark complete.")
 
 
 if __name__ == "__main__":

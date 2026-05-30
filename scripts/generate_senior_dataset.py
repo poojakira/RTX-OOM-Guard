@@ -117,7 +117,7 @@ def main():
     manifest = []
     generated = 0
 
-    print(f"Generating {len(indices)} traces in {out_dir} ...")
+    import logging; logging.info(f"Generating {len(indices)} traces in {out_dir} ...")
 
     for i, idx in enumerate(indices):
         cfg = configs[idx]
@@ -135,7 +135,7 @@ def main():
             )
             events = wl.run(steps=steps, seed=42 + i)
         except Exception as e:
-            print(f"  [{i+1:3d}] SKIP {name}: {e}")
+            import logging; logging.info(f"  [{i+1:3d}] SKIP {name}: {e}")
             continue
 
         if len(events) < 100:
@@ -163,7 +163,7 @@ def main():
 
         generated += 1
         if (i + 1) % 10 == 0 or (i + 1) == len(indices):
-            print(f"  [{i+1:3d}/{len(indices)}] {name:40s}  "
+            import logging; logging.info(f"  [{i+1:3d}/{len(indices)}] {name:40s}  "
                   f"events={len(events):5d}  frag={np.mean(frags):.3f}  "
                   f"OOMs={ooms}  label={label}")
 
@@ -174,12 +174,12 @@ def main():
 
     # Summary stats
     labels = [m["risk_label"] for m in manifest]
-    print(f"\n{'='*60}")
-    print(f"Generated {generated} traces → {out_dir}")
-    print(f"  stable:    {labels.count('stable')}")
-    print(f"  high_risk: {labels.count('high_risk')}")
-    print(f"  critical:  {labels.count('critical')}")
-    print(f"  manifest:  {manifest_path}")
+    import logging; logging.info(f"\n{'='*60}")
+    import logging; logging.info(f"Generated {generated} traces → {out_dir}")
+    import logging; logging.info(f"  stable:    {labels.count('stable')}")
+    import logging; logging.info(f"  high_risk: {labels.count('high_risk')}")
+    import logging; logging.info(f"  critical:  {labels.count('critical')}")
+    import logging; logging.info(f"  manifest:  {manifest_path}")
 
 
 if __name__ == "__main__":

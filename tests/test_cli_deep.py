@@ -65,7 +65,7 @@ def test_cli_no_rich_fallback():
     with patch("rtx_oom_guard.cli.HAS_RICH", False), \
          patch("builtins.print") as mock_print:
         print_banner()
-        _print("test message")
+        _import logging; logging.info("test message")
         assert mock_print.called
 
 def test_cli_main_entrypoint_dunder():

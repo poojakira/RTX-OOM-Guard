@@ -89,19 +89,19 @@ def run_serious_benchmarks(n_trials=5, iterations_per_trial=100):
     log.info(f"\nSaved experimental results table to {csv_file}")
 
     # Console Print
-    print("=" * 60)
-    print("SERIOUS EVALUATION RESULTS (N=5 Trials)")
-    print("=" * 60)
-    print(f"{'Metric':<20} | {'Baseline':<15} | {'rtx_oom_guard':<15} | {'Improvement':<10}")
-    print("-" * 60)
-    print(f"{'OOM Errors':<20} | {b_oom_mean:<15.1f} | {d_oom_mean:<15.1f} | {oom_imp:.1f}%")
-    print(f"{'Iteration Time (s)':<20} | {b_time_mean:<15.3f} | {d_time_mean:<15.3f} | {time_imp:.1f}%")
-    print(f"{'Peak Memory (MB)':<20} | {b_mem_mean:<15.0f} | {d_mem_mean:<15.0f} | {mem_imp:.1f}%")
-    print("=" * 60)
-    print("WHY IMPROVEMENT HAPPENS:")
-    print("By tracking allocation patterns, the Transformer model predicts PyTorch memory gaps.")
-    print("When fragmentation reaches a critical threshold, it triggers a synchronous eviction and")
-    print("compaction mapping using the Triton engine BEFORE memory exhausts, avoiding OOM cascades.")
+    import logging; logging.info("=" * 60)
+    import logging; logging.info("SERIOUS EVALUATION RESULTS (N=5 Trials)")
+    import logging; logging.info("=" * 60)
+    import logging; logging.info(f"{'Metric':<20} | {'Baseline':<15} | {'rtx_oom_guard':<15} | {'Improvement':<10}")
+    import logging; logging.info("-" * 60)
+    import logging; logging.info(f"{'OOM Errors':<20} | {b_oom_mean:<15.1f} | {d_oom_mean:<15.1f} | {oom_imp:.1f}%")
+    import logging; logging.info(f"{'Iteration Time (s)':<20} | {b_time_mean:<15.3f} | {d_time_mean:<15.3f} | {time_imp:.1f}%")
+    import logging; logging.info(f"{'Peak Memory (MB)':<20} | {b_mem_mean:<15.0f} | {d_mem_mean:<15.0f} | {mem_imp:.1f}%")
+    import logging; logging.info("=" * 60)
+    import logging; logging.info("WHY IMPROVEMENT HAPPENS:")
+    import logging; logging.info("By tracking allocation patterns, the Transformer model predicts PyTorch memory gaps.")
+    import logging; logging.info("When fragmentation reaches a critical threshold, it triggers a synchronous eviction and")
+    import logging; logging.info("compaction mapping using the Triton engine BEFORE memory exhausts, avoiding OOM cascades.")
 
     # Graphing
     if MATPLOTLIB_AVAILABLE:

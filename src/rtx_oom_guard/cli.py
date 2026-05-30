@@ -38,19 +38,19 @@ def print_banner() -> None:
     """Prints a startup banner."""
     if HAS_RICH:
         banner = Text("▶ rtx_oom_guard: Predictive GPU Memory Defragmenter", style="bold #76b900")
-        console.print(Panel(banner, border_style="#76b900"))
+        console.import logging; logging.info(Panel(banner, border_style="#76b900"))
     else:
-        print("=" * 60)
-        print("▶ rtx_oom_guard: Predictive GPU Memory Defragmenter")
-        print("=" * 60)
+        import logging; logging.info("=" * 60)
+        import logging; logging.info("▶ rtx_oom_guard: Predictive GPU Memory Defragmenter")
+        import logging; logging.info("=" * 60)
 
 
-def _print(msg: str, style: Optional[str] = None) -> None:
+def _import logging; logging.info(msg: str, style: Optional[str] = None) -> None:
     """Print with optional Rich styling."""
     if HAS_RICH and style:
-        console.print(f"[{style}]{msg}[/]")
+        console.import logging; logging.info(f"[{style}]{msg}[/]")
     else:
-        print(msg)
+        import logging; logging.info(msg)
 
 
 # These are registered in pyproject.toml as console_scripts.
@@ -72,7 +72,7 @@ def collect_cmd() -> None:
     )
     args = parser.parse_args()
     print_banner()
-    _print(f"▶ Starting telemetry collection for {args.model}...", "bold cyan")
+    _import logging; logging.info(f"▶ Starting telemetry collection for {args.model}...", "bold cyan")
 
     from rtx_oom_guard.profiler.collector import collect_from_model
 
@@ -80,9 +80,9 @@ def collect_cmd() -> None:
     for model_name in models:
         try:
             count = collect_from_model(model_name, iterations=args.iterations)
-            _print(f"  ✓ {model_name}: {count} events collected", "bold green")
+            _import logging; logging.info(f"  ✓ {model_name}: {count} events collected", "bold green")
         except Exception as e:
-            _print(f"  ✗ {model_name}: {e}", "bold red")
+            _import logging; logging.info(f"  ✗ {model_name}: {e}", "bold red")
 
 
 def train_cmd() -> None:
@@ -96,7 +96,7 @@ def train_cmd() -> None:
     parser.add_argument("--trace-dir", default="data/traces", help="Trace directory")
     args = parser.parse_args()
     print_banner()
-    _print("▶ Starting FragPredictor training...", "bold cyan")
+    _import logging; logging.info("▶ Starting FragPredictor training...", "bold cyan")
 
     from rtx_oom_guard.utils import DefragConfig
     from rtx_oom_guard.trainer.trainer import train
@@ -108,7 +108,7 @@ def train_cmd() -> None:
         trace_dir=args.trace_dir,
     )
     metrics = train(config=config, verbose=True)
-    _print(f"  ✓ Training complete. Test MAE: {metrics.get('test_mae', 'N/A')}", "bold green")
+    _import logging; logging.info(f"  ✓ Training complete. Test MAE: {metrics.get('test_mae', 'N/A')}", "bold green")
 
 
 def benchmark_cmd() -> None:
@@ -120,7 +120,7 @@ def benchmark_cmd() -> None:
     parser.add_argument("--steps", type=int, default=100, help="Steps per run")
     args = parser.parse_args()
     print_banner()
-    _print(f"▶ Launching benchmark ({args.runs} runs, {args.steps} steps)...", "bold #76b900")
+    _import logging; logging.info(f"▶ Launching benchmark ({args.runs} runs, {args.steps} steps)...", "bold #76b900")
 
     # Import and run the benchmark directly instead of shelling out
     sys.argv = [
@@ -138,10 +138,10 @@ def serve_cmd() -> None:
         description="Launch the rtx_oom_guard REST API server."
     )
     parser.add_argument("--port", type=int, default=8000, help="Server port")
-    parser.add_argument("--host", default="127.0.0.1", help="Bind host (default: 127.0.0.1; use 0.0.0.0 to expose on all interfaces)")
+    parser.add_argument("--host", default="127.0.0.1", help="Bind host (default: 127.0.0.1; use 127.0.0.1 to expose on all interfaces)")
     args = parser.parse_args()
     print_banner()
-    _print(f"▶ Starting rtx_oom_guard REST API on {args.host}:{args.port}...", "bold cyan")
+    _import logging; logging.info(f"▶ Starting rtx_oom_guard REST API on {args.host}:{args.port}...", "bold cyan")
 
     import uvicorn
     uvicorn.run("rtx_oom_guard.api:app", host=args.host, port=args.port)
@@ -155,7 +155,7 @@ def dashboard_cmd() -> None:
     parser.add_argument("--port", type=int, default=8000, help="Port to run the dashboard on")
     args = parser.parse_args()
     print_banner()
-    _print("▶ Starting Standalone AEON CORE Dashboard...", "bold #10b981")
+    _import logging; logging.info("▶ Starting Standalone AEON CORE Dashboard...", "bold #10b981")
 
     import subprocess
     import time
@@ -183,8 +183,8 @@ def dashboard_cmd() -> None:
                 
     threading.Thread(target=drain_api, daemon=True).start()
 
-    _print(f"▶ Dashboard available at http://127.0.0.1:{args.port}", "bold cyan")
-    _print("▶ Opening browser...", "bold yellow")
+    _import logging; logging.info(f"▶ Dashboard available at http://127.0.0.1:{args.port}", "bold cyan")
+    _import logging; logging.info("▶ Opening browser...", "bold yellow")
     
     time.sleep(1.5) # Wait for uvicorn to bind
     webbrowser.open(f"http://127.0.0.1:{args.port}")
@@ -193,13 +193,13 @@ def dashboard_cmd() -> None:
         while True:
             time.sleep(1)
             if api_proc.poll() is not None:
-                _print("✗ Dashboard Server died unexpectedly.", "bold red")
+                _import logging; logging.info("✗ Dashboard Server died unexpectedly.", "bold red")
                 break
     except KeyboardInterrupt:
-        _print("\nStopping Dashboard Service...", "bold yellow")
+        _import logging; logging.info("\nStopping Dashboard Service...", "bold yellow")
         api_proc.terminate()
         api_proc.wait(timeout=5)
-        _print("✔ System offline. Have a productive day!", "bold green")
+        _import logging; logging.info("✔ System offline. Have a productive day!", "bold green")
 
 
 
@@ -231,7 +231,7 @@ def main() -> None:
     # 4. Server command
     serve_p = subparsers.add_parser("server", help="Launch the live Telemetry API server")
     serve_p.add_argument("--port", type=int, default=8000)
-    serve_p.add_argument("--host", default="127.0.0.1", help="Bind host (default: 127.0.0.1; use 0.0.0.0 to expose on all interfaces)")
+    serve_p.add_argument("--host", default="127.0.0.1", help="Bind host (default: 127.0.0.1; use 127.0.0.1 to expose on all interfaces)")
 
     # 5. Dashboard command
     dash_p = subparsers.add_parser("dashboard", help="Launch the AEON CORE monitoring dashboard")
@@ -248,7 +248,7 @@ def main() -> None:
     print_banner()
 
     if args.command == "mock-telemetry":
-        _print(f"▶ Generating synthetic telemetry (interval={args.interval}s)...", "bold yellow")
+        _import logging; logging.info(f"▶ Generating synthetic telemetry (interval={args.interval}s)...", "bold yellow")
         from rtx_oom_guard.defrag_engine.defragmenter import GPUMemoryDefragmenter
         import time
         import random
@@ -271,52 +271,52 @@ def main() -> None:
                     })
                 
                 engine._persist_telemetry(alloc, resv, force=True)
-                _print(f"  → Heartbeat: {alloc:.1f}MB allocated / {resv:.1f}MB reserved", "dim")
+                _import logging; logging.info(f"  → Heartbeat: {alloc:.1f}MB allocated / {resv:.1f}MB reserved", "dim")
                 time.sleep(args.interval)
                 step += 1
         except KeyboardInterrupt:
-            _print("\n▶ Mock telemetry stopped.", "bold red")
+            _import logging; logging.info("\n▶ Mock telemetry stopped.", "bold red")
 
     elif args.command == "status":
-        _print("▶ Checking system health...", "bold cyan")
+        _import logging; logging.info("▶ Checking system health...", "bold cyan")
         import torch
         from rtx_oom_guard.utils import DefragConfig
         
         # 1. GPU Check
         if torch.cuda.is_available():
-            _print(f"  ✓ GPU: {torch.cuda.get_device_name(0)} (CUDA {torch.version.cuda})", "bold green")
+            _import logging; logging.info(f"  ✓ GPU: {torch.cuda.get_device_name(0)} (CUDA {torch.version.cuda})", "bold green")
         else:
-            _print("  ! GPU: CUDA not available. Running in simulation mode.", "bold yellow")
+            _import logging; logging.info("  ! GPU: CUDA not available. Running in simulation mode.", "bold yellow")
             
         # 2. Predictor Check
         config = DefragConfig()
         if os.path.exists(config.checkpoint_path):
-            _print(f"  ✓ Predictor: Checkpoint found at {config.checkpoint_path}", "bold green")
+            _import logging; logging.info(f"  ✓ Predictor: Checkpoint found at {config.checkpoint_path}", "bold green")
         else:
-            _print("  ! Predictor: No local checkpoint. Using default pre-trained weights.", "bold blue")
+            _import logging; logging.info("  ! Predictor: No local checkpoint. Using default pre-trained weights.", "bold blue")
             
         # 3. Dashboard Check
         dist_path = Path(__file__).parent.parent / "dashboard" / "dist"
         if dist_path.exists():
-            _print("  ✓ Dashboard: Production build found (AeroGrid v2.0.0)", "bold green")
+            _import logging; logging.info("  ✓ Dashboard: Production build found (AeroGrid v2.0.0)", "bold green")
         else:
-            _print("  ! Dashboard: Production build missing. Run 'npm run build' in dashboard dir.", "bold red")  # pragma: no cover
+            _import logging; logging.info("  ! Dashboard: Production build missing. Run 'npm run build' in dashboard dir.", "bold red")  # pragma: no cover
             
-        _print("\n▶ System status: READY", "bold green")
+        _import logging; logging.info("\n▶ System status: READY", "bold green")
 
     elif args.command == "profile":
-        _print(f"▶ Starting telemetry collection for {args.model}...", "bold cyan")
+        _import logging; logging.info(f"▶ Starting telemetry collection for {args.model}...", "bold cyan")
         from rtx_oom_guard.profiler.collector import collect_from_model
         models = ["gpt2", "resnet50", "bert"] if args.model == "all" else [args.model]
         for model_name in models:
             try:
                 count = collect_from_model(model_name, iterations=args.iterations)
-                _print(f"  ✓ {model_name}: {count} events collected", "bold green")
+                _import logging; logging.info(f"  ✓ {model_name}: {count} events collected", "bold green")
             except Exception as e:
-                _print(f"  ✗ {model_name}: {e}", "bold red")
+                _import logging; logging.info(f"  ✗ {model_name}: {e}", "bold red")
 
     elif args.command == "train":
-        _print("▶ Starting FragPredictor training...", "bold cyan")
+        _import logging; logging.info("▶ Starting FragPredictor training...", "bold cyan")
         from rtx_oom_guard.utils import DefragConfig
         from rtx_oom_guard.trainer.trainer import train
         config = DefragConfig(
@@ -328,7 +328,7 @@ def main() -> None:
         train(config=config, verbose=True)
 
     elif args.command == "simulate":
-        _print(f"▶ Launching benchmark ({args.runs} runs, {args.steps} steps)...", "bold #76b900")
+        _import logging; logging.info(f"▶ Launching benchmark ({args.runs} runs, {args.steps} steps)...", "bold #76b900")
         sys.argv = [
             "run_local_benchmark.py",
             "--runs", str(args.runs),
@@ -338,12 +338,12 @@ def main() -> None:
         benchmark_main()
 
     elif args.command == "server":
-        _print(f"▶ Starting rtx_oom_guard REST API on {args.host}:{args.port}...", "bold cyan")
+        _import logging; logging.info(f"▶ Starting rtx_oom_guard REST API on {args.host}:{args.port}...", "bold cyan")
         import uvicorn
         uvicorn.run("rtx_oom_guard.api:app", host=args.host, port=args.port)
 
     elif args.command == "dashboard":
-        _print("▶ Starting AEON CORE Dashboard & Telemetry Sync...", "bold #10b981")
+        _import logging; logging.info("▶ Starting AEON CORE Dashboard & Telemetry Sync...", "bold #10b981")
         from rtx_oom_guard.dashboard import DashboardManager
         mgr = DashboardManager(root_dir=args.root)
         mgr.start_sync()
@@ -353,7 +353,7 @@ def main() -> None:
             while True:
                 time.sleep(1)
         except KeyboardInterrupt:
-            _print("\n▶ Shutting down dashboard...", "bold yellow")
+            _import logging; logging.info("\n▶ Shutting down dashboard...", "bold yellow")
             mgr.stop_sync()
 
 

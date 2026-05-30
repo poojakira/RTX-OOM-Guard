@@ -261,7 +261,7 @@ def collect_trace(
         batch_sizes = [default_bs] * steps
 
     param_count = sum(p.numel() for p in model.parameters())
-    print(f"  Model: {model_name} ({param_count:,} params) on {DEVICE}")
+    import logging; logging.info(f"  Model: {model_name} ({param_count:,} params) on {DEVICE}")
 
     if HAS_CUDA:
         torch.cuda.reset_peak_memory_stats()
@@ -396,18 +396,18 @@ def main():
     out_dir = Path(ROOT / args.output)
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    print(f"Device: {DEVICE} ({GPU_NAME})")
-    print(f"Models: {args.models}")
-    print(f"Steps:  {args.steps:,} per model")
-    print(f"Output: {out_dir}")
-    print()
+    import logging; logging.info(f"Device: {DEVICE} ({GPU_NAME})")
+    import logging; logging.info(f"Models: {args.models}")
+    import logging; logging.info(f"Steps:  {args.steps:,} per model")
+    import logging; logging.info(f"Output: {out_dir}")
+    import logging; logging.info()
 
     manifest = []
     grand_total = 0
 
     for model_name in args.models:
-        print(f"\n{'='*60}")
-        print(f"Training {model_name} for {args.steps:,} real steps...")
+        import logging; logging.info(f"\n{'='*60}")
+        import logging; logging.info(f"Training {model_name} for {args.steps:,} real steps...")
 
         # Optional varying batch sizes
         batch_sizes = None
@@ -455,9 +455,9 @@ def main():
         manifest.append(entry)
         grand_total += len(events)
 
-        print(f"  → {len(events):,} events in {elapsed:.1f}s")
-        print(f"  → Frag: [{entry['min_frag']:.4f}, {entry['max_frag']:.4f}]  mean={entry['mean_frag']:.4f}")
-        print(f"  → Saved: {parquet_path} ({entry['parquet_size_mb']:.1f} MB)")
+        import logging; logging.info(f"  → {len(events):,} events in {elapsed:.1f}s")
+        import logging; logging.info(f"  → Frag: [{entry['min_frag']:.4f}, {entry['max_frag']:.4f}]  mean={entry['mean_frag']:.4f}")
+        import logging; logging.info(f"  → Saved: {parquet_path} ({entry['parquet_size_mb']:.1f} MB)")
 
         # Clean up model to free memory for next
         del events
@@ -470,13 +470,13 @@ def main():
     with open(manifest_path, "w") as f:
         json.dump(manifest, f, indent=2)
 
-    print(f"\n{'='*60}")
-    print("Real data collection complete")
-    print(f"  Total events:  {grand_total:,}")
-    print(f"  Models:        {', '.join(args.models)}")
-    print(f"  Device:        {DEVICE} ({GPU_NAME})")
-    print(f"  Output:        {out_dir}")
-    print(f"  Manifest:      {manifest_path}")
+    import logging; logging.info(f"\n{'='*60}")
+    import logging; logging.info("Real data collection complete")
+    import logging; logging.info(f"  Total events:  {grand_total:,}")
+    import logging; logging.info(f"  Models:        {', '.join(args.models)}")
+    import logging; logging.info(f"  Device:        {DEVICE} ({GPU_NAME})")
+    import logging; logging.info(f"  Output:        {out_dir}")
+    import logging; logging.info(f"  Manifest:      {manifest_path}")
 
 
 if __name__ == "__main__":

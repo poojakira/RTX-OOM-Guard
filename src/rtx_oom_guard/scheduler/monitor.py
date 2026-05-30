@@ -48,7 +48,7 @@ class DefragMonitor:
             optimizer.step()
 
         monitor.stop()
-        print(monitor.stats())
+        import logging; logging.info(monitor.stats())
     """
 
     def __init__(

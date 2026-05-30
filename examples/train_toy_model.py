@@ -30,7 +30,7 @@ from rtx_oom_guard.defrag_engine.policy import MitigationPolicy
 
 def main():
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    print(f"Device: {device}")
+    import logging; logging.info(f"Device: {device}")
 
     # -- Toy model ---------------------------------------------------------
     model = nn.Sequential(
@@ -53,7 +53,7 @@ def main():
     batch_size = 32
     n_steps = 20
 
-    print(f"\nTraining {n_steps} steps (batch_size={batch_size}) …\n")
+    import logging; logging.info(f"\nTraining {n_steps} steps (batch_size={batch_size}) …\n")
 
     for step in range(n_steps):
         x = torch.randn(batch_size, 64, device=device)
@@ -81,20 +81,20 @@ def main():
     # -- Summary -----------------------------------------------------------
     summary = logger.summary()
     counts = policy.action_counts
-    print("\n" + "=" * 60)
-    print("Summary")
-    print("=" * 60)
-    print(f"  Total steps        : {summary.get('total_steps', 0)}")
-    print(f"  Avg allocated (MB) : {summary.get('avg_allocated_mb', 0):.2f}")
-    print(f"  Peak reserved (MB) : {summary.get('peak_reserved_mb', 0):.2f}")
-    print(f"  Avg fragmentation  : {summary.get('avg_fragmentation', 0):.6f}")
-    print(f"  Avg step time (s)  : {summary.get('avg_step_time_s', 0):.6f}")
-    print(f"  Policy — SAFE={counts['SAFE']}  WARN={counts['WARN']}  ACT={counts['ACT']}")
-    print("=" * 60)
+    import logging; logging.info("\n" + "=" * 60)
+    import logging; logging.info("Summary")
+    import logging; logging.info("=" * 60)
+    import logging; logging.info(f"  Total steps        : {summary.get('total_steps', 0)}")
+    import logging; logging.info(f"  Avg allocated (MB) : {summary.get('avg_allocated_mb', 0):.2f}")
+    import logging; logging.info(f"  Peak reserved (MB) : {summary.get('peak_reserved_mb', 0):.2f}")
+    import logging; logging.info(f"  Avg fragmentation  : {summary.get('avg_fragmentation', 0):.6f}")
+    import logging; logging.info(f"  Avg step time (s)  : {summary.get('avg_step_time_s', 0):.6f}")
+    import logging; logging.info(f"  Policy — SAFE={counts['SAFE']}  WARN={counts['WARN']}  ACT={counts['ACT']}")
+    import logging; logging.info("=" * 60)
 
     # Export
     logger.to_json("results/toy_model_log.json")
-    print("\nLog saved → results/toy_model_log.json")
+    import logging; logging.info("\nLog saved → results/toy_model_log.json")
 
 
 if __name__ == "__main__":

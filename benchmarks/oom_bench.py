@@ -188,7 +188,7 @@ def main():
     args = ap.parse_args()
 
     if not torch.cuda.is_available():
-        print("ERROR: No CUDA GPU found."); return
+        import logging; logging.info("ERROR: No CUDA GPU found."); return
 
     gpu = torch.cuda.get_device_name(0)
     total_gb = torch.cuda.get_device_properties(0).total_memory / 1024**3

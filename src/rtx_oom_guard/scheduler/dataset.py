@@ -112,9 +112,9 @@ def create_dataloaders(
     if n < 3: # Need at least 1 per split
         log.warning("Extremely small dataset (%d samples); using dummy splits", n)
         return (
-            DataLoader(dataset, batch_size=min(n, config.batch_size), shuffle=True),
-            DataLoader(dataset, batch_size=min(n, config.batch_size), shuffle=False),
-            DataLoader(dataset, batch_size=min(n, config.batch_size), shuffle=False),
+            DataLoader(dataset, batch_size=min(n, config.batch_size, pin_memory=True), shuffle=True),
+            DataLoader(dataset, batch_size=min(n, config.batch_size, pin_memory=True), shuffle=False),
+            DataLoader(dataset, batch_size=min(n, config.batch_size, pin_memory=True), shuffle=False),
         )
 
     train_n = int(n * 0.8)
@@ -126,7 +126,7 @@ def create_dataloaders(
     )
 
     return (
-        DataLoader(train_ds, batch_size=config.batch_size, shuffle=True, num_workers=0, pin_memory=True),
-        DataLoader(val_ds, batch_size=config.batch_size, shuffle=False, num_workers=0, pin_memory=True),
-        DataLoader(test_ds, batch_size=config.batch_size, shuffle=False, num_workers=0, pin_memory=True),
+        DataLoader(train_ds, batch_size=config.batch_size, shuffle=True, num_workers=0, pin_memory=True, pin_memory=True),
+        DataLoader(val_ds, batch_size=config.batch_size, shuffle=False, num_workers=0, pin_memory=True, pin_memory=True),
+        DataLoader(test_ds, batch_size=config.batch_size, shuffle=False, num_workers=0, pin_memory=True, pin_memory=True),
     )

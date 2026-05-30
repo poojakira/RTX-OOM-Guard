@@ -19,7 +19,7 @@ def generate_traces():
     trace_dir = ROOT / "data" / "traces"
     trace_dir.mkdir(parents=True, exist_ok=True)
     
-    print(f"Generating sample traces in {trace_dir}...")
+    import logging; logging.info(f"Generating sample traces in {trace_dir}...")
     
     configs = [
         ("gpt2_trace.parquet", 256),
@@ -56,7 +56,7 @@ def generate_traces():
             
         collector.save(str(trace_dir / filename))
     
-    print("Traces generated successfully.")
+    import logging; logging.info("Traces generated successfully.")
 
 if __name__ == "__main__":
     generate_traces()

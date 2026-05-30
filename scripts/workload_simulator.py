@@ -546,7 +546,7 @@ if __name__ == "__main__":
         events = wl.run(steps=args.steps, seed=42)
         frags = [e["fragmentation"] for e in events]
         ooms = sum(1 for e in events if e["oom"])
-        print(f"{spec.name:20s}  events={len(events):5d}  "
+        import logging; logging.info(f"{spec.name:20s}  events={len(events):5d}  "
               f"frag=[{min(frags):.3f}, {max(frags):.3f}]  "
               f"mean={np.mean(frags):.3f}  OOMs={ooms}")
 
@@ -557,4 +557,4 @@ if __name__ == "__main__":
         frags = [e["fragmentation"] for e in events]
         assert max(frags) > 0.05, f"Max frag too low: {max(frags)}"
         assert len(events) > 500, f"Too few events: {len(events)}"
-        print("\n✓ Verification passed")
+        import logging; logging.info("\n✓ Verification passed")

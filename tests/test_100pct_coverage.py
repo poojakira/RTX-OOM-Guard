@@ -57,7 +57,7 @@ class TestCLICoverage:
                      patch("rtx_oom_guard.cli.console", None), \
                      patch("builtins.print") as mock_print:
                     print_banner()
-                    _print("test message")
+                    _import logging; logging.info("test message")
                     assert mock_print.call_count >= 2
 
     def test_cli_collect_error_branch(self):

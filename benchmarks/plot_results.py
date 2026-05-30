@@ -14,7 +14,7 @@ from pathlib import Path
 def plot_before_after():
     results_path = Path("results/comparison.json")
     if not results_path.exists():
-        print(f"Error: {results_path} not found.")
+        import logging; logging.info(f"Error: {results_path} not found.")
         return
 
     with open(results_path, "r") as f:
@@ -65,7 +65,7 @@ def plot_before_after():
     out_path = Path("results/benchmark_charts.png")
     os.makedirs("results", exist_ok=True)
     plt.savefig(out_path, dpi=300)
-    print(f"Saved chart to {out_path}")
+    import logging; logging.info(f"Saved chart to {out_path}")
 
 if __name__ == "__main__":
     plot_before_after()
