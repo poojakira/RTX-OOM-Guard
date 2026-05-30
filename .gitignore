@@ -37,3 +37,6 @@ data/test.parquet
 .coverage
 htmlcov/
 *.whl
+sbom.json
+pnpm-lock.yaml
+pnpm-workspace.yaml
