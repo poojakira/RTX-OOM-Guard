@@ -67,8 +67,14 @@ class DashboardManager:
 
         log.info("Launching AEON CORE Dashboard via Vite...")
         try:
-            # Use shell=True for Windows compatibility with npm
-            self._vite_proc = subprocess.Popen(["npm", "run", "dev"], cwd=self.dashboard_dir, shell=True)
+            # Security fix (B602): removed shell=True to prevent shell injection.
+            # On Windows, use 'npm.cmd' explicitly; on POSIX use 'npm' directly.
+            npm_cmd = "npm.cmd" if os.name == "nt" else "npm"
+            self._vite_proc = subprocess.Popen(
+                [npm_cmd, "run", "dev"],
+                cwd=self.dashboard_dir,
+                shell=False,  # noqa: S603
+            )
         except Exception as e:
             log.error(f"Failed to start Vite: {e}")
 

@@ -124,20 +124,31 @@ class FragPredictor(nn.Module):
 
     @classmethod
     def load(cls, path: str, config: Optional[DefragConfig] = None, device: str = "cpu") -> "FragPredictor":
-        """Load a trained model from checkpoint."""
+        """Load a trained model from checkpoint.
+
+        Security note: ``weights_only=True`` is set to prevent arbitrary code
+        execution via pickle deserialization (semgrep: python.lang.security.audit.pickle).
+        Only load checkpoints from trusted sources.
+        """
         config = config or DefragConfig()
         model = cls.from_config(config)
-        state = torch.load(path, map_location=device, weights_only=True)
+        # weights_only=True prevents pickle-based code execution (CVE-class: insecure deserialization)
+        state = torch.load(path, map_location=device, weights_only=True)  # noqa: S614
         model.load_state_dict(state)
         model.to(device)
         model.eval()
         return model
 
     def save(self, path: str) -> None:
-        """Save model checkpoint."""
+        """Save model state-dict checkpoint.
+
+        Security note: ``torch.save`` uses pickle internally. Only load the
+        resulting file with ``weights_only=True`` (see :meth:`load`).
+        """
         from pathlib import Path
         Path(path).parent.mkdir(parents=True, exist_ok=True)
-        torch.save(self.state_dict(), path)
+        # Saves state_dict only (not the full model object) to limit pickle surface
+        torch.save(self.state_dict(), path)  # noqa: S614
 
     def count_parameters(self) -> int:
         return sum(p.numel() for p in self.parameters() if p.requires_grad)

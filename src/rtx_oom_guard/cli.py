@@ -138,7 +138,7 @@ def serve_cmd() -> None:
         description="Launch the rtx_oom_guard REST API server."
     )
     parser.add_argument("--port", type=int, default=8000, help="Server port")
-    parser.add_argument("--host", default="0.0.0.0", help="Bind host")
+    parser.add_argument("--host", default="127.0.0.1", help="Bind host (default: 127.0.0.1; use 0.0.0.0 to expose on all interfaces)")
     args = parser.parse_args()
     print_banner()
     _print(f"▶ Starting rtx_oom_guard REST API on {args.host}:{args.port}...", "bold cyan")
@@ -231,7 +231,7 @@ def main() -> None:
     # 4. Server command
     serve_p = subparsers.add_parser("server", help="Launch the live Telemetry API server")
     serve_p.add_argument("--port", type=int, default=8000)
-    serve_p.add_argument("--host", default="0.0.0.0")
+    serve_p.add_argument("--host", default="127.0.0.1", help="Bind host (default: 127.0.0.1; use 0.0.0.0 to expose on all interfaces)")
 
     # 5. Dashboard command
     dash_p = subparsers.add_parser("dashboard", help="Launch the AEON CORE monitoring dashboard")

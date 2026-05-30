@@ -75,7 +75,7 @@ def train(args):
     # Data Loading
     dataset = RandomDataset(args.input_size, args.num_samples)
     sampler = DistributedSampler(dataset)
-    dataloader = DataLoader(dataset, batch_size=args.batch_size, sampler=sampler)
+    dataloader = DataLoader(dataset, batch_size=args.batch_size, sampler=sampler, pin_memory=True)
 
     # MLflow tracking
     if local_rank == 0 and HAS_MLFLOW:

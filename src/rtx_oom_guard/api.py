@@ -13,12 +13,18 @@ app = FastAPI(
     version="2.0.0",
 )
 
+# Security fix: restrict CORS to localhost origins only (was wildcard "*").
+# Override ALLOWED_ORIGINS env var in production to set explicit allowed domains.
+import os as _os
+_CORS_ORIGINS = _os.environ.get(
+    "ALLOWED_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173"
+).split(",")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=_CORS_ORIGINS,
     allow_credentials=False,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST"],
+    allow_headers=["Content-Type", "Authorization"],
 )
 
 # Shared state
